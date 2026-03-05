@@ -1,0 +1,37 @@
+﻿
+> prototype-customer-service@0.1.0 build
+> next build
+
+  Γû▓ Next.js 14.2.3
+
+   Creating an optimized production build ...
+ Γ£ô Compiled successfully
+   Linting and checking validity of types ...
+node.exe : Failed to compile.
+At C:\Program Files\nodejs\npm.ps1:29 char:3
++   & $NODE_EXE $NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (Failed to compile.:String) 
+    [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+./src/presentation/components/DisambiguationModal/DisambiguationModal.ts
+x:4:35
+Type error: Cannot find module 
+'../../domain/customer/SubscriberSearchTypes' or its corresponding type 
+declarations.
+
+[0m [90m 2 |[39m[0m
+[0m [90m 3 |[39m [36mimport[39m [33mReact[39m [36mfrom[39m 
+[32m"react"[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 4 |[39m [36mimport[39m { 
+[33mSearchSubsDetails[39m } [36mfrom[39m 
+[32m"../../domain/customer/SubscriberSearchTypes"[39m[33m;[39m[0m
+[0m [90m   |[39m                                   
+[31m[1m^[22m[39m[0m
+[0m [90m 5 |[39m[0m
+[0m [90m 6 |[39m [36minterface[39m 
+[33mDisambiguationModalProps[39m {[0m
+[0m [90m 7 |[39m   candidates[33m:[39m 
+[33mSearchSubsDetails[39m[][33m;[39m[0m
