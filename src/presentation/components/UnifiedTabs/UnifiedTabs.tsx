@@ -9,6 +9,9 @@ import BillingAndSOATab from "../FinancialSummary/BillingAndSOATab";
 import ServiceHierarchyCard from "../HardwareDetails/ServiceHierarchyCard";
 import KittyRedemptionPanel from "../PackageTool/KittyRedemptionPanel";
 import PromoOffersList from "../PackageTool/PromoOffersList";
+import ComplaintHistoryTab from "../CallHandling/ComplaintHistoryTab";
+import PostpaidConversionForm from "../Recharge/PostpaidConversionForm";
+import MODDashboardTab from "../MOD/MODDashboardTab";
 
 interface UnifiedTabsProps {
   historyData: any;
@@ -24,9 +27,12 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
     { id: "timeline", label: "History Timeline" },
     { id: "contact", label: "Contact Details 🆕" },
     { id: "packages", label: "Package Tool" },
+    { id: "mod", label: "Movies & PPV 🎬" },
+    { id: "complaints", label: "Tickets & Service 🎫" },
     { id: "promos", label: "Offers & Promos 🎁" },
+    { id: "migration", label: "Migration 🔄" },
     { id: "call", label: "Call Handling" },
-    { id: "service", label: "Service & Hardware" },
+    { id: "service", label: "Hardware History" },
     { id: "billing", label: "Billing & SOA" },
   ];
 
@@ -104,12 +110,30 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
           <PackageToolBox vcNumber={vcNumber} smsId={smsId} />
         )}
 
+        {activeTab === "mod" && (
+          <MODDashboardTab vcNumber={vcNumber} smsId={smsId} />
+        )}
+
+        {activeTab === "complaints" && (
+          <ComplaintHistoryTab vcNumber={vcNumber} />
+        )}
+
         {activeTab === "promos" && (
           <div style={{ padding: "16px" }}>
             <KittyRedemptionPanel smsId={smsId} />
             <div style={{ marginTop: "24px" }}>
               <PromoOffersList smsId={smsId} />
             </div>
+          </div>
+        )}
+
+        {activeTab === "migration" && (
+          <div style={{ padding: "16px" }}>
+            <PostpaidConversionForm 
+              vcNumber={vcNumber} 
+              smsId={smsId} 
+              onSuccess={(id) => alert(`Lead ${id} submitted for Postpaid Conversion!`)} 
+            />
           </div>
         )}
 

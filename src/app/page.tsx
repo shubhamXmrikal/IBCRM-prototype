@@ -21,6 +21,8 @@ import {
 } from "../domain/customer/SubscriberSearchTypes";
 import BottomToolbar from "../components/customer-service/BottomToolbar";
 import RightIconBar from "../components/customer-service/RightIconBar";
+import RechargeWorkflowPanel from "../presentation/components/Recharge/RechargeWorkflowPanel";
+import ChurnAlertBanner from "../presentation/components/Recharge/ChurnAlertBanner";
 
 export default function Customer360Page() {
   const [customer, setCustomer] = useState<Customer | null>(null);
@@ -30,6 +32,7 @@ export default function Customer360Page() {
   const [outboundCampaigns, setOutboundCampaigns] = useState<OutboundCampaignEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showRecharge, setShowRecharge] = useState(false);
 
   // Disambiguation state — shown when MOBILE/EMAIL returns multiple accounts
   const [multiMatchCandidates, setMultiMatchCandidates] = useState<
@@ -103,7 +106,7 @@ export default function Customer360Page() {
 
   return (
     <div className="crm-layout">
-      <Sidebar />
+      <Sidebar onRecharge={() => setShowRecharge(true)} />
       <main className="crm-main">
         <Header
           onSearch={handleSearch}
@@ -129,36 +132,13 @@ export default function Customer360Page() {
             </div>
           )}
 
-          {/* Empty state */}
-          {!customer && !loading && !error && !multiMatchCandidates && (
-            <div
-              style={{
-                textAlign: "center",
-                marginTop: "100px",
-                color: "var(--text-secondary)",
-              }}
-            >
-              <h2>Search for a subscriber to view their 360 profile</h2>
-              <p style={{ fontSize: "13px", opacity: 0.6, marginTop: "8px" }}>
-                Search by VC No, RMN, Mobile, SMS ID, STB No, or Email
-              </p>
-            </div>
-          )}
-
-          {/* Loading state */}
-          {loading && (
-            <div style={{ textAlign: "center", marginTop: "100px" }}>
-              <div style={{ fontSize: "14px", color: "var(--text-secondary)" }}>
-                Searching subscriber records…
-              </div>
-            </div>
-          )}
-
           {/* 360 View */}
           {customer && !loading && (
             <div
               style={{ display: "flex", flexDirection: "column", gap: "20px" }}
             >
+              <ChurnAlertBanner smsId={customer.smsId} />
+
               <ActionModals
                 customerName={customer.name}
                 vcNumber={customer.vcNumber}
@@ -209,6 +189,14 @@ export default function Customer360Page() {
           searchValue={multiMatchSearchValue}
           onSelect={handleDisambiguationSelect}
           onClose={() => setMultiMatchCandidates(null)}
+        />
+      )}
+
+      {showRecharge && customer && (
+        <RechargeWorkflowPanel 
+          vcNumber={customer.vcNumber} 
+          smsId={customer.smsId} 
+          onClose={() => setShowRecharge(false)} 
         />
       )}
     </div>

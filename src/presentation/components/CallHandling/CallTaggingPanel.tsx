@@ -2,14 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { CallCategoryNode } from "../../../domain/call/CallHandlingTypes";
+import LogComplaintModal from "./LogComplaintModal";
 
 interface CallTaggingPanelProps {
   vcNumber: string;
+  smsId: string;
   agentId: string;
   onSuccess: () => void;
 }
 
-export default function CallTaggingPanel({ vcNumber, agentId, onSuccess }: CallTaggingPanelProps) {
+export default function CallTaggingPanel({ vcNumber, smsId, agentId, onSuccess }: CallTaggingPanelProps) {
   const [categories, setCategories] = useState<CallCategoryNode[]>([]);
   const [selections, setSelections] = useState<string[]>([]);
   const [remarks, setRemarks] = useState("");
@@ -17,6 +19,7 @@ export default function CallTaggingPanel({ vcNumber, agentId, onSuccess }: CallT
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [callbackInfo, setCallbackInfo] = useState<string | null>(null);
+  const [showComplaintModal, setShowComplaintModal] = useState(false);
 
   useEffect(() => {
     fetch("/api/calls/categories")
@@ -137,6 +140,16 @@ export default function CallTaggingPanel({ vcNumber, agentId, onSuccess }: CallT
           </label>
 
           <div style={{ display: "flex", gap: "8px" }}>
+            {!isResolved && !callbackInfo && (
+              <button 
+                type="button" 
+                className="btn-primary" 
+                style={{ backgroundColor: "#6366f1" }}
+                onClick={() => setShowComplaintModal(true)}
+              >
+                Log Complaint 🎫
+              </button>
+            )}
             {callbackInfo ? (
               <button type="button" className="btn-primary" onClick={onSuccess}>Close Panel</button>
             ) : (
@@ -147,6 +160,19 @@ export default function CallTaggingPanel({ vcNumber, agentId, onSuccess }: CallT
           </div>
         </div>
       </form>
+
+      {showComplaintModal && (
+        <LogComplaintModal 
+          vcNumber={vcNumber} 
+          smsId={smsId} 
+          onClose={() => setShowComplaintModal(false)} 
+          onSuccess={(tktId) => {
+            setShowComplaintModal(false);
+            alert(`Ticket ${tktId} logged successfully. You can now close the call.`);
+            setIsResolved(false); // Ensure it stays unresolved as a ticket is now open
+          }}
+        />
+      )}
     </div>
   );
 }

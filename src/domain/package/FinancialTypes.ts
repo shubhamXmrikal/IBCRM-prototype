@@ -63,3 +63,48 @@ export interface CityMaster {
   name: string;
   areas: string[];
 }
+
+export interface WaiverRequest {
+  id: string;
+  vcNumber: string;
+  smsId: string;
+  amount: number;
+  reasonId: string;
+  reasonName: string;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  requestedBy: string;
+  requestedOn: Date;
+  remarks: string;
+  approvedBy?: string;
+  approvedOn?: Date;
+}
+
+export interface WaiverReason {
+  id: string;
+  name: string;
+}
+
+export interface PaymentReceipt {
+  id: string;
+  date: Date;
+  amount: number;
+  mode: "CASH" | "CHEQUE" | "ONLINE" | "UPI";
+  type: "CR" | "DR";
+  bank?: string;
+  referenceNo: string;
+  status: string;
+}
+
+export interface GraceChargeInfo {
+  applies: boolean;
+  totalAmount: number;
+  preTaxAmount: number;
+  taxAmount: number;
+}
+
+export interface OutstandingBalance {
+  general: number;
+  installation: number;
+  serviceCall: number;
+  payLater: number;
+}

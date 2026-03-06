@@ -1,6 +1,10 @@
 import React from "react";
 
-export default function Sidebar() {
+interface SidebarProps {
+  onRecharge?: () => void;
+}
+
+export default function Sidebar({ onRecharge }: SidebarProps) {
   return (
     <aside className="crm-sidebar">
       <div
@@ -31,6 +35,12 @@ export default function Sidebar() {
             <span style={{ fontSize: "14px", fontWeight: 500 }}>
               Customer 360
             </span>
+          </li>
+          <li 
+            style={{ padding: "12px 24px", opacity: 0.7, cursor: "pointer" }}
+            onClick={onRecharge}
+          >
+            <span style={{ fontSize: "14px", color: "#fbbf24", fontWeight: 600 }}>⚡ Recharge Account</span>
           </li>
           <li style={{ padding: "12px 24px", opacity: 0.7, cursor: "pointer" }}>
             <span style={{ fontSize: "14px" }}>Service Calls</span>

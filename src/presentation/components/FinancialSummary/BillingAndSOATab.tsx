@@ -2,16 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import { SOAHeader, SOATransaction } from "../../../domain/package/FinancialTypes";
+import OutstandingBalanceSummary from "./OutstandingBalanceSummary";
+import PaymentHistoryTab from "./PaymentHistoryTab";
+import WaiverRequestModal from "./WaiverRequestModal";
 
 interface BillingAndSOATabProps {
   vcNumber: string;
+  smsId: string;
 }
 
-export default function BillingAndSOATab({ vcNumber }: BillingAndSOATabProps) {
+export default function BillingAndSOATab({ vcNumber, smsId }: BillingAndSOATabProps) {
   const [header, setHeader] = useState<SOAHeader | null>(null);
   const [transactions, setTransactions] = useState<SOATransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewRPT, setViewRPT] = useState(7);
+  const [showWaiverModal, setShowWaiverModal] = useState(false);
 
   useEffect(() => {
     fetchSOA();
@@ -36,6 +41,8 @@ export default function BillingAndSOATab({ vcNumber }: BillingAndSOATabProps) {
 
   return (
     <div style={styles.container}>
+      <OutstandingBalanceSummary vcNumber={vcNumber} />
+
       {/* Header Summary Card */}
       {header && (
         <div style={styles.headerCard}>
@@ -61,7 +68,15 @@ export default function BillingAndSOATab({ vcNumber }: BillingAndSOATabProps) {
           </div>
           <div style={styles.headerFooter}>
             <div style={styles.label}>Statement Period: <span style={{ color: "var(--text-primary)" }}>{header.statementPeriod}</span></div>
-            <button onClick={handleResendInvoice} style={styles.btn}>Resend Latest Invoice ✉️</button>
+            <div style={{ display: "flex", gap: "10px" }}>
+              <button 
+                onClick={() => setShowWaiverModal(true)} 
+                style={{ ...styles.btn, background: "#6366f1" }}
+              >
+                Request Waiver 💸
+              </button>
+              <button onClick={handleResendInvoice} style={styles.btn}>Resend Latest Invoice ✉️</button>
+            </div>
           </div>
         </div>
       )}
@@ -117,6 +132,20 @@ export default function BillingAndSOATab({ vcNumber }: BillingAndSOATabProps) {
           </tbody>
         </table>
       </div>
+
+      <PaymentHistoryTab vcNumber={vcNumber} />
+
+      {showWaiverModal && (
+        <WaiverRequestModal 
+          vcNumber={vcNumber} 
+          smsId={smsId} 
+          onClose={() => setShowWaiverModal(false)}
+          onSuccess={(id) => {
+            setShowWaiverModal(false);
+            alert(`Waiver request ${id} submitted successfully for approval.`);
+          }}
+        />
+      )}
     </div>
   );
 }

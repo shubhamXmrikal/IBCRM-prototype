@@ -280,3 +280,130 @@ Search for **Rahul Sharma** (`VC: 09100000001`).
 3. Search for **Jaffer Resht** (`VC: 02563029393`).
 4. Navigate to the **"Offers & Promos 🎁"** tab.
 5. **Expected Result:** You see **"HBO Winback 30 Days"** marked as **EXPIRED** with a red stamp, providing agents with historical context on previous winback attempts.
+
+---
+
+## 9. Testing Complaint & Service Request Logging (Module 08)
+
+### Scenario A: Logging a Standard CRM Complaint
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. Navigate to the **"Call Handling"** tab.
+3. Uncheck the **"Issue Resolved"** box.
+4. **Expected Result:** a purple **"Log Complaint 🎫"** button appears.
+5. Click the button. A modal titled **"Log New Complaint"** opens.
+6. Select **"Billing Dispute"** as the category.
+7. Enter remarks: "Customer disputing last month GST calculation."
+8. Click **"Log Complaint"**.
+9. **Expected Result:** A success message with a Ticket ID (e.g., `TKT123456`) appears.
+
+### Scenario B: Technical Service Request (Multi-Step)
+
+1. In the same **"Log New Complaint"** modal, select **"No Signal"** as the category.
+2. **Expected Result:** The primary action button changes to **"Next: Appointment →"**.
+3. Click the button to move to **Step 2**.
+4. Enter an STB Number and select a preferred date and time slot (e.g., 09:00 AM - 12:00 PM).
+5. Click **"Create Service Request"**.
+6. **Expected Result:** A Service Request ticket is created, emulating the `InsertServiceComplaintDetails` workflow.
+
+### Scenario C: Duplicate Complaint Validation
+
+1. Try to log another 2 complaints for **Rahul Sharma** immediately after Scenario A and B.
+2. On the 3rd attempt, click **"Log Complaint 🎫"**.
+3. **Expected Result:** A validation error screen appears: **"Duplicate Check: This subscriber already has 2 active complaints logged in the last 3 days."** This verifies the porting of the legacy duplicate prevention logic.
+
+### Scenario D: Ticket History Audit
+
+1. Navigate to the **"Tickets & Service 🎫"** tab.
+2. **Expected Result:**
+   - A list showing all historical and recent tickets.
+   - For Jaffer Resht, you will see a high-priority STB replacement request with an **"Agony Count"** tracking its repeat nature.
+   - Tickets are color-coded by status (e.g., BLUE for OPEN, GREEN for RESOLVED).
+
+---
+
+## 10. Testing Payment, Grace & Waiver (Module 09)
+
+### Scenario A: Outstanding Balance Alert
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. Navigate to the **"Billing & SOA"** tab.
+3. **Expected Result:** A red alert box appears at the top: **"Outstanding Balance Detected"**. It shows a **₹250.00 Service Call OS**, emulating the `GetSR_OS_Balance` logic.
+
+### Scenario B: Waiver Request & Quota Enforcement
+
+1. In the **"Billing & SOA"** tab, click the purple **"Request Waiver 💸"** button.
+2. Select a reason (e.g., `Goodwill Waiver`), enter an amount (e.g., `50`), and remarks.
+3. Click **"Submit for Approval"**.
+4. **Expected Result:** A success message appears.
+5. **Repeat**: Try requesting 2 more waivers for Rahul.
+6. **Expected Result:** On the 3rd attempt, the system blocks the request with: **"Exhausted Count: Maximum 2 waivers allowed..."**. This verifies the porting of the legacy waiver quota business rule.
+
+### Scenario C: Payment & Receipt History
+
+1. In the same **"Billing & SOA"** tab, scroll down to the **"Recharge & Payment Receipts"** section.
+2. **Expected Result:** You see a list of physical and online payments. 
+3. Verify the **"CHEQUE"** entry for **₹350.00** from **HDFC Bank** marked as **REALIZED**. This emulates the `usp_CustomerService_PaymentDetailsReciept` lookup.
+
+### Scenario D: Grace Charge Check (Side-effect)
+
+1. Perform a mock recharge for a long-inactive subscriber (e.g., search for a deactive user).
+2. **Expected Result:** The system triggers an internal `checkGraceCharge` call. Check the terminal/console for logs: `[MockFinancialRepository] Grace charge info: applies=true`. In a real scenario, this would inform the agent to collect the processing fee.
+
+---
+
+## 11. Testing Recharge & Migration (Module 10)
+
+### Scenario A: Multi-Step Recharge Workflow
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. In the **Sidebar** (left navigation), click **"⚡ Recharge Account"**.
+3. **Step 1 (Validate)**: Observe the system running the "CheckVCSTB" checks. For Rahul, **Amnesty Eligibility** should be "✅ YES".
+4. Click **"Proceed to Due Amount →"**.
+5. **Step 2 (Due Amount)**: View the calculated amount payable.
+6. Click **"Process Simulated Payment"**.
+7. **Expected Result:** A success screen confirms the recharge is complete.
+
+### Scenario B: Churn Prevention Alert
+
+1. Search for **Priya Menon** (`STB: STB9876PRIYA0001`).
+2. **Expected Result:** A red alert banner appears at the very top of her profile: **"Critical: Account at Risk of Churn"**.
+3. It should show **"Only 10 days remaining"**, emulating the churn timer logic from `usp_CustomerService_GetChurnRemainingDays`.
+
+### Scenario C: Postpaid Migration Lead
+
+1. Navigate to the **"Migration 🔄"** tab.
+2. Fill out the **"Prepaid to Postpaid Conversion"** form.
+3. Select **"DishFlix Hybrid"** as the product variant.
+4. Click **"Submit Conversion Lead 🚀"**.
+5. **Expected Result:** A success alert appears with a Lead ID (e.g., `LD123456`), verifying the `InsertLeadforProspectivePrepaidCustomer` workflow.
+
+---
+
+## 12. Testing Movies & PPV (Module 11)
+
+### Scenario A: Movie Kitty Balance
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. Navigate to the **"Movies & PPV 🎬"** tab.
+3. **Expected Result:** A dark banner at the top shows: **"Movie Kitty Balance: 3 free movies remaining"**. This emulates the `ModFreeKitty` loyalty lookup.
+
+### Scenario B: Ordering a Movie (Validation & Payment)
+
+1. In the **"Browse Catalogue"** grid, find a movie (e.g., "Avatar: The Way of Water").
+2. Click **"Order Now"**.
+3. **Expected Result:** A confirmation modal opens. Notice the warning: **"Requires 3-Satellite alignment"** for Avatar.
+4. Select **"Movie Kitty"** as the payment mode.
+5. Click **"Confirm & Authorize Signal"**.
+6. **Expected Result:** The order is processed, and the movie appears in the **"Current Authorizations"** list on the right.
+
+### Scenario C: Duplicate Order Guard
+
+1. Try to order the **same movie** ("Avatar") again for Rahul.
+2. **Expected Result:** The system blocks the request with an error: **"CheckRequestIsAlreadySubmited: This movie is already authorized..."**. This verifies the porting of the legacy duplicate guard.
+
+### Scenario D: Resending Signal (CONAX Push)
+
+1. In the **"Current Authorizations"** list, find an active movie (e.g., "Pathaan").
+2. Click **"Resend Signal 📡"**.
+3. **Expected Result:** A success alert confirms the signal has been re-sent, emulating the `InsertResendMODRequest` (CONAX) push.

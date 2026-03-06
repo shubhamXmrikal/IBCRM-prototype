@@ -110,3 +110,61 @@ export const mockGeography: GeographyMaster[] = [
     ]
   }
 ];
+
+export const mockWaiverReasons: WaiverReason[] = [
+  { id: "1", name: "Goodwill Waiver" },
+  { id: "2", name: "Technical Issue - No Signal" },
+  { id: "3", name: "Wrong Package Charged" },
+  { id: "4", name: "Late Fee Reversal" },
+  { id: "5", name: "Retention Offer" }
+];
+
+export const mockWaiverRequests: WaiverRequest[] = [
+  {
+    id: "WAV001",
+    vcNumber: "09100000001",
+    smsId: "41200100",
+    amount: 150,
+    reasonId: "1",
+    reasonName: "Goodwill Waiver",
+    status: "APPROVED",
+    requestedBy: "AGENT_001",
+    requestedOn: new Date("2026-02-20"),
+    remarks: "Subscriber was unable to use service for 3 days due to rain.",
+    approvedBy: "MANAGER_DELHI",
+    approvedOn: new Date("2026-02-21")
+  }
+];
+
+export const mockPaymentReceipts: Record<string, PaymentReceipt[]> = {
+  "09100000001": [
+    {
+      id: "RCP001",
+      date: new Date("2026-03-25"),
+      amount: 350,
+      mode: "ONLINE",
+      type: "CR",
+      referenceNo: "PG_TXN_99881",
+      status: "SUCCESS"
+    },
+    {
+      id: "RCP002",
+      date: new Date("2026-02-25"),
+      amount: 350,
+      mode: "CHEQUE",
+      type: "CR",
+      bank: "HDFC Bank",
+      referenceNo: "CHQ_112233",
+      status: "REALIZED"
+    }
+  ]
+};
+
+export const mockOutstandingBalances: Record<string, OutstandingBalance> = {
+  "09100000001": {
+    general: 0,
+    installation: 0,
+    serviceCall: 250,
+    payLater: 0
+  }
+};
