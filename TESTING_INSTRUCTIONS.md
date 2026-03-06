@@ -218,3 +218,65 @@ Search for **Rahul Sharma** (`VC: 09100000001`) or **Priya Menon** (`STB: STB987
 
 1. In the **"Subscriber Detail"** card, click on a social media handle (e.g., Rahul's LinkedIn).
 2. **Expected Result:** In this prototype, handles are displayed as high-visibility labels to ensure agents have 360-degree contact context for retention and collection calls.
+
+---
+
+## 7. Testing Package & Channel Display (Module 06)
+
+Search for **Rahul Sharma** (`VC: 09100000001`).
+
+### Scenario A: Statement of Account (SOA)
+
+1. Select the **"Billing & SOA"** tab.
+2. **Expected Result:**
+   - A summary card shows: **Balance (₹142.50)**, **Monthly Recharge (₹350.00)**, and **Switch-Off Date**.
+   - A **"Resend Latest Invoice ✉️"** button is visible. Clicking it triggers a success alert (simulating the `WebConn` email trigger).
+   - A transaction table lists recent activities (Recharges and Monthly Renewals) with color-coded Debit/Credit amounts.
+3. Use the **dropdown** above the table to switch between "Current (Detailed)" and "FY 2024-25" views.
+
+### Scenario B: Service Hierarchy & Escalation Matrix
+
+1. Select the **"Service & Hardware"** tab.
+2. Observe the **"Assigned Service Chain (Hierarchy)"** section at the top.
+3. **Expected Result:**
+   - A visual tree shows the assigned **DCC (Delhi Electronics Hub)** with full contact info and address.
+   - Below it, the **Escalation Matrix** displays the names and phone numbers for the **ASE**, **CSM**, and **Operations Manager**.
+   - This emulates the legacy `usp_CustomerService_EsclationMatrixSVC` logic.
+
+### Scenario C: Entitled Channel Search
+
+1. Select the **"Package Tool"** tab.
+2. Next to the "Currently Active" header, click the **"View Channels 📺"** button.
+3. **Expected Result:** A modal opens listing all channels the subscriber is entitled to based on their pack.
+4. In the search bar, type `Sports`.
+5. **Expected Result:** The list filters to show only sports channels (e.g., Star Sports 1 HD).
+6. Look for **HBO** in the list. Notice the orange label: **"Requires 3-Satellite"**. This confirms the technical constraint flags from `GetAllConaxChannelList` are being surfaced.
+
+---
+
+## 8. Testing Alacarte & Addon Management (Module 07)
+
+### Scenario A: Summer Ticket (Seasonal Upsell)
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. Navigate to the **"Package Tool"** tab.
+3. **Expected Result:** A bright orange banner appears at the top: **"IPL 2026 Summer Ticket Available!"**.
+4. Click **"Opt In Now"**. In this prototype, it triggers a processing alert, emulating the seasonal bundle opt-in flow.
+
+### Scenario B: Kitty Alacarte (Loyalty Redemption)
+
+1. Navigate to the **"Offers & Promos 🎁"** tab.
+2. **Expected Result:** The **"Kitty Alacarte (Loyalty)"** panel is visible at the top.
+3. Observe Rahul's balance: **500 pts**.
+4. Select one or more channels (e.g., Zee Cinema).
+5. Notice the "Points Required" calculation updates dynamically.
+6. Click **"Redeem Now"**.
+7. **Expected Result:** A success message appears with a **Form No**, confirming the loyalty redemption transaction.
+
+### Scenario C: Promotional & Trial History
+
+1. In the same **"Offers & Promos 🎁"** tab, scroll to the **"Active Promotions & Trials"** grid.
+2. For Rahul, you should see **"Sony Pix Free Trial"** marked as **ACTIVE**.
+3. Search for **Jaffer Resht** (`VC: 02563029393`).
+4. Navigate to the **"Offers & Promos 🎁"** tab.
+5. **Expected Result:** You see **"HBO Winback 30 Days"** marked as **EXPIRED** with a red stamp, providing agents with historical context on previous winback attempts.

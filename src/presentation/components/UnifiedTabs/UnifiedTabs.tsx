@@ -5,6 +5,10 @@ import HistoryTimeline from "../HistoryTimeline/HistoryTimeline";
 import PackageToolBox from "../PackageTool/PackageToolBox";
 import CallTaggingPanel from "../CallHandling/CallTaggingPanel";
 import AlternateMobilesPanel from "../ContactUpdate/AlternateMobilesPanel";
+import BillingAndSOATab from "../FinancialSummary/BillingAndSOATab";
+import ServiceHierarchyCard from "../HardwareDetails/ServiceHierarchyCard";
+import KittyRedemptionPanel from "../PackageTool/KittyRedemptionPanel";
+import PromoOffersList from "../PackageTool/PromoOffersList";
 
 interface UnifiedTabsProps {
   historyData: any;
@@ -20,6 +24,7 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
     { id: "timeline", label: "History Timeline" },
     { id: "contact", label: "Contact Details 🆕" },
     { id: "packages", label: "Package Tool" },
+    { id: "promos", label: "Offers & Promos 🎁" },
     { id: "call", label: "Call Handling" },
     { id: "service", label: "Service & Hardware" },
     { id: "billing", label: "Billing & SOA" },
@@ -96,7 +101,16 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
         )}
 
         {activeTab === "packages" && (
-          <PackageToolBox vcNumber={vcNumber} />
+          <PackageToolBox vcNumber={vcNumber} smsId={smsId} />
+        )}
+
+        {activeTab === "promos" && (
+          <div style={{ padding: "16px" }}>
+            <KittyRedemptionPanel smsId={smsId} />
+            <div style={{ marginTop: "24px" }}>
+              <PromoOffersList smsId={smsId} />
+            </div>
+          </div>
         )}
 
         {activeTab === "call" && (
@@ -112,32 +126,26 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
         )}
 
         {activeTab === "service" && (
-          <div
-            style={{
-              padding: "32px",
-              textAlign: "center",
-              color: "var(--text-secondary)",
-            }}
-          >
-            <h3>Service & Hardware</h3>
-            <p style={{ marginTop: "8px" }}>
-              DVR, INS Requests, Installation, and Technical Escalations.
-            </p>
+          <div style={{ padding: "16px" }}>
+            <ServiceHierarchyCard vcNumber={vcNumber} />
+            <div
+              style={{
+                padding: "32px",
+                textAlign: "center",
+                color: "var(--text-secondary)",
+              }}
+            >
+              <h3>Service & Hardware</h3>
+              <p style={{ marginTop: "8px" }}>
+                DVR, INS Requests, Installation, and Technical Escalations.
+              </p>
+            </div>
           </div>
         )}
 
         {activeTab === "billing" && (
-          <div
-            style={{
-              padding: "32px",
-              textAlign: "center",
-              color: "var(--text-secondary)",
-            }}
-          >
-            <h3>Billing & SOA</h3>
-            <p style={{ marginTop: "8px" }}>
-              Statement of Account, Payments, Reconciliations, and Waivers.
-            </p>
+          <div style={{ padding: "16px" }}>
+            <BillingAndSOATab vcNumber={vcNumber} />
           </div>
         )}
       </div>
