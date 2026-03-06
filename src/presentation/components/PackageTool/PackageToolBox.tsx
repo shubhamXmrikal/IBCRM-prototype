@@ -226,6 +226,7 @@ export default function PackageToolBox({
           <OptInModal
             pkg={optInPkg}
             vcNumber={vcNumber}
+            smsId={smsId}
             onClose={() => setOptInPkg(null)}
             onSuccess={() => {
               setOptInPkg(null);

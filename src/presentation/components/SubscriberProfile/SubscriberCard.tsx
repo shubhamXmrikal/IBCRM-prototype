@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { Customer } from "../../../domain/customer/Customer";
 import ContactUpdatePanel from "../ContactUpdate/ContactUpdatePanel";
+import VIPStatusBadge from "./VIPStatusBadge";
 
 interface SubscriberCardProps {
   customer: Customer;
@@ -59,15 +60,18 @@ export default function SubscriberCard({ customer }: SubscriberCardProps) {
 
   return (
     <div className="card" style={{ marginBottom: 0 }}>
-      <h3
-        style={{
-          fontSize: "14px",
-          color: "var(--brand-primary)",
-          marginBottom: "12px",
-        }}
-      >
-        Subscriber Detail
-      </h3>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "12px" }}>
+        <h3
+          style={{
+            fontSize: "14px",
+            color: "var(--brand-primary)",
+            margin: 0,
+          }}
+        >
+          Subscriber Detail
+        </h3>
+        <VIPStatusBadge vcNumber={customer.vcNumber} />
+      </div>
       <div
         style={{
           fontSize: "20px",

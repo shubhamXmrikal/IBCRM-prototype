@@ -23,6 +23,8 @@ import BottomToolbar from "../components/customer-service/BottomToolbar";
 import RightIconBar from "../components/customer-service/RightIconBar";
 import RechargeWorkflowPanel from "../presentation/components/Recharge/RechargeWorkflowPanel";
 import ChurnAlertBanner from "../presentation/components/Recharge/ChurnAlertBanner";
+import AgentGlobalToolbar from "../presentation/components/CallHandling/AgentGlobalToolbar";
+import MOTDBanner from "../presentation/components/SubscriberProfile/MOTDBanner";
 
 export default function Customer360Page() {
   const [customer, setCustomer] = useState<Customer | null>(null);
@@ -80,6 +82,13 @@ export default function Customer360Page() {
       setInteractions(data.history?.interactions ?? []);
       setServiceRequests(data.history?.serviceRequests ?? []);
       setOutboundCampaigns(data.history?.outboundCampaigns ?? []);
+
+      // Record access in agent session
+      await fetch("/api/agent/session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agentId: "AGENT_001", vcNo: data.subscriber.vcNumber })
+      });
     } catch (err: any) {
       setError(err.message ?? "Error fetching data");
     } finally {
@@ -137,6 +146,7 @@ export default function Customer360Page() {
             <div
               style={{ display: "flex", flexDirection: "column", gap: "20px" }}
             >
+              <MOTDBanner smsId={customer.smsId} />
               <ChurnAlertBanner smsId={customer.smsId} />
 
               <ActionModals
@@ -199,6 +209,8 @@ export default function Customer360Page() {
           onClose={() => setShowRecharge(false)} 
         />
       )}
+
+      <AgentGlobalToolbar />
     </div>
   );
 }

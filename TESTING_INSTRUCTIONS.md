@@ -407,3 +407,192 @@ Search for **Rahul Sharma** (`VC: 09100000001`).
 1. In the **"Current Authorizations"** list, find an active movie (e.g., "Pathaan").
 2. Click **"Resend Signal 📡"**.
 3. **Expected Result:** A success alert confirms the signal has been re-sent, emulating the `InsertResendMODRequest` (CONAX) push.
+
+---
+
+## 13. Testing Hardware & STB (Module 12)
+
+### Scenario A: Hardware State & Pairing
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. Navigate to the **"Hardware History"** tab (this tab ID is `service` in the code).
+3. **Expected Result:**
+   - A card titled **"Active Set-Top Box"** appears.
+   - It shows serial **2101XYZ45PQ19001**, status **IN WARRANTY**, and chip side **Top**.
+   - The **"Assigned Service Chain"** (from Module 06) is also visible at the top.
+
+### Scenario B: Orchestrated STB Swap
+
+1. In the **"Hardware History"** tab, click **"🔄 STB Swap / Repair"**.
+2. **Step 1 (Validate)**: Enter a valid replacement serial: `NEW_STB_001`. Click **"Validate Serial →"**.
+3. **Step 2 (Compatibility)**: 
+   - Notice the green box: **"New STB Verified: HD-S3 (HD)"**.
+   - Enter a Ticket ID (e.g., `TKT123456`).
+   - Select an **Adapter Brand** (e.g., `Samsung`).
+   - Check **"Adapter Returned"** and **"Remote Returned"**.
+   - Click **"Confirm & Swap STB"**.
+4. **Expected Result:**
+   - Success alert appears.
+   - The **"Active Set-Top Box"** card refreshes to show the new serial (`NEW_STB_001`).
+   - A new entry appears in the **"Hardware Lifecycle History"** list on the right.
+
+### Scenario C: Inventory Validation (Error Path)
+
+1. Re-open the **"STB Swap Wizard"**.
+2. Enter an invalid serial number: `INVALID_999`.
+3. Click **"Validate Serial →"**.
+4. **Expected Result:** Error message appears: **"Invalid Serial Number: STB not found..."**. This verifies the master inventory gate check.
+
+---
+
+## 14. Testing Watcho / OTT (Module 13)
+
+### Scenario A: Active Subscription & Bundled Apps
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. Navigate to the **"Watcho 📱"** tab.
+3. **Expected Result:**
+   - Shows **Watcho Super** as the active plan.
+   - Lists bundled apps like **Disney+ Hotstar**, **Zee5**, etc.
+   - Expiry date is shown as **10/04/2026**.
+
+### Scenario B: Auto-Renewal (SI) Toggle
+
+1. In the **"Watcho 📱"** tab, observe the **"Standing Instruction"** toggle. For Rahul, it should be **Active (Green)**.
+2. Click the toggle to disable it.
+3. **Expected Result:** The status changes to **Inactive (Gray)** and the helper text updates to **"Manual renewal required."**, emulating the `UpdateWatchoAutoRenewalFlag` logic.
+
+### Scenario C: Plan Wizard & Coupon Redemption
+
+1. Search for **Priya Menon** (`VC: 07800009999`).
+2. Navigate to the **"Watcho 📱"** tab.
+3. **Expected Result:** Shows **"No active Watcho subscription found."**.
+4. Click **"Explore Plans 🚀"**.
+5. **Step 1 (Select Plan)**: Choose **"Watcho Flexi"** (₹99) and click **"Continue to Review →"**.
+6. **Step 2 (Review)**: 
+   - Enter coupon code: `WATCHO50`. Click **"Apply"**.
+   - **Expected Result:** Alert shows "Coupon applied" and the **Total Payable** updates to **₹49**.
+7. Click **"Confirm Subscription"**.
+8. **Expected Result:** success message appears with a Watcho Form No (e.g., `W_UP_992211`).
+
+---
+
+## 15. Testing DishVIP & Loyalty (Module 14)
+
+### Scenario A: DishVIP Status & Benefits
+
+1. Search for **Priya Menon** (`VC: 07800009999`).
+2. **Expected Result:** A gold badge stating **"🌟 DishVIP Member"** is visible in the top-right of the Subscriber Detail card.
+3. Click the badge.
+4. **Expected Result:** A modal opens showing her enrollment date and a list of premium benefits (Priority Support, Free STB Swap, etc.).
+
+### Scenario B: VIP Enrollment (Eligible Prospect)
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. **Expected Result:** A gray badge stating **"⚙️ Check VIP Eligibility"** appears.
+3. Click the badge.
+4. **Expected Result:** The modal shows **"✅ Subscriber is Eligible!"** along with the reason.
+5. Click **"Enroll in DishVIP Now 🚀"**.
+6. **Expected Result:** Success alert appears, and the badge turns gold (🌟 DishVIP Member).
+
+---
+
+## 16. Testing SMS, OTP & IP Address (Module 15)
+
+### Scenario A: Communication History & IP Audit
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. Navigate to the **"Communications 💬"** tab.
+3. **Expected Result:** 
+   - A list of historical SMS and WhatsApp messages appears.
+   - For each message, observe the **Agent IP** column (e.g., `172.16.0.45`). This verifies the porting of the legacy `REMOTE_ADDR` capture requirement.
+   - Statuses like **DELIVERED** (Green) or **SENT** (Blue) are visible.
+
+### Scenario B: Security OTP Challenge (STB Swap Gate)
+
+1. Navigate to the **"Hardware History"** tab (ID: `service`).
+2. Click **"🔄 STB Swap / Repair"**.
+3. **Expected Result:** Instead of the swap wizard opening immediately, a **"Security Verification"** modal appears.
+4. Click **"Send OTP 📲"**.
+5. **Expected Result:** A debug alert shows the generated 6-digit code (e.g., `[DEBUG] OTP Sent: 123456`).
+6. Enter the code and click **"Verify Code →"**.
+7. **Expected Result:** The modal closes, and the **STB Swap Wizard** opens. This emulates the high-security gating for hardware operations.
+
+### Scenario C: OTP Expiry & Validation
+
+1. Re-trigger the **"STB Swap / Repair"** flow.
+2. Send a new OTP.
+3. Enter an **incorrect code** (e.g., `000000`).
+4. **Expected Result:** Error message appears: **"Invalid or expired OTP code."**.
+5. Click **"Didn't receive code? Resend"** to restart the flow, emulating the `ManageOTPUseCase` logic.
+
+### Scenario C: Unified Loyalty Dashboard
+
+1. Stay on **Rahul Sharma**'s profile.
+2. Select the **"360 Overview"** tab.
+3. **Expected Result:** A card titled **"Unified Loyalty Rewards"** appears.
+4. It should show:
+   - **DTH Points**: 1250
+   - **Movie Credits**: 3
+   - **DishFlix Amt**: ₹0
+5. Below the balances, verify the **"Recent Activity"** log shows earned/spent points (e.g., "+100 pts on Recharge").
+
+---
+
+## 17. Testing Agent Toolbar & System Tools (Module 16)
+
+### Scenario A: Persistent Agent Toolbar
+
+1. Observe the very bottom of the browser window.
+2. **Expected Result:** A dark gray bar (Agent Toolbar) is visible.
+3. It should show:
+   - **Active Agent**: Aman S. (AGENT_001)
+   - **Routing Mode**: **ZT REPLICA (Active)** — this is dynamically determined based on the mock IP `10.10.17.42`.
+   - **Captured IP**: The simulated IP of your machine.
+
+### Scenario B: Message of the Day (MOTD)
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. **Expected Result:** A yellow banner appears above his profile: **"Subscriber pack expires in 3 days..."**.
+3. Search for **Priya Menon** (`VC: 07800009999`).
+4. **Expected Result:** The banner updates to show: **"VIP Subscriber. Ensure priority handling."**. This emulates the `usp_CustomerService_GetInformationByVC` proactive info logic.
+
+### Scenario C: Last Worked VC Tracking
+
+1. Search for **Jaffer Resht** (`VC: 02563029393`).
+2. Now, search for **Rahul Sharma**.
+3. Observe the **right side** of the bottom Agent Toolbar.
+4. **Expected Result:** It should show **"Last Worked: 02563029393"**. The system automatically tracked your previous search, emulating the legacy `usp_CustomerService_InsertVCNo` tracking.
+
+---
+
+## 18. Testing Festive Offers & Campaigns (Module 17)
+
+### Scenario A: Campaign Hub & Milestones
+
+1. Search for **Rahul Sharma** (`VC: 09100000001`).
+2. Navigate to the **"Offers & Promos 🎁"** tab.
+3. **Expected Result:** 
+   - A **"Live Campaigns"** section appears at the top.
+   - For Rahul, notice the **"Cricket World Cup 2026"** entry with 250 bonus points and checked milestones (e.g., "Watched 5 Matches").
+   - A red **"Festive Cashback Eligible!"** banner is visible showing **₹150** credit.
+
+### Scenario B: FMR Projections (Upsell Aid)
+
+1. Navigate to the **"Package Tool"** tab.
+2. In the **Package Catalogue** (right side), click **"Add Pack"** on any available package (e.g., "7 HD Channels Free" or "Cricket Live VAS").
+3. **Expected Result:** The **"Activate Package"** modal opens.
+4. Inside the modal, look for the green **"FMR Benefits"** card.
+5. **Expected Result:** It should show exact credit projections (e.g., "1 Month: ₹50", "6 Months: ₹350"). This emulates the legacy `USP_GetSubscriberFMRValue` calculation to help agents close the sale.
+
+### Scenario C: Festive Upgrade Discovery
+
+1. Go back to the **"Offers & Promos 🎁"** tab.
+2. Scroll to **"Festive Special Upgrades"**.
+3. **Expected Result:** You see cards like **"Diwali Dhamaka HD"** with an **"Apply Offer"** button. This verifies the zone-and-STB filtering logic from `USP_GetFestiveOfferAccordingToSMSID`.
+
+### Scenario D: Ineligible Prospect
+
+1. Search for **Jaffer Resht** (`VC: 02563029393`).
+2. Click the VIP Eligibility badge.
+3. **Expected Result:** The modal shows **"❌ Not Eligible for VIP"** with the reason: "Monthly FMR below threshold...". The enrollment button is hidden.

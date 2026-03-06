@@ -2,15 +2,17 @@
 
 import React, { useState } from "react";
 import { PackageItem } from "../../../domain/package/PackageTypes";
+import FMRBenefitWidget from "./FMRBenefitWidget";
 
 interface OptInModalProps {
   pkg: PackageItem;
   vcNumber: string;
+  smsId: string;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export default function OptInModal({ pkg, vcNumber, onClose, onSuccess }: OptInModalProps) {
+export default function OptInModal({ pkg, vcNumber, smsId, onClose, onSuccess }: OptInModalProps) {
   const [consentGiven, setConsentGiven] = useState(false);
   const [scheduledDate, setScheduledDate] = useState("");
   const [loading, setLoading] = useState(false);
@@ -53,7 +55,9 @@ export default function OptInModal({ pkg, vcNumber, onClose, onSuccess }: OptInM
           You are adding <strong>{pkg.name}</strong> for ₹{pkg.price}.
         </p>
 
-        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+        <FMRBenefitWidget smsId={smsId} schemeId={pkg.id} />
+
+        <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "16px" }}>
           {error && <div style={{ color: "#ef4444", fontSize: "13px" }}>{error}</div>}
           
           <div>

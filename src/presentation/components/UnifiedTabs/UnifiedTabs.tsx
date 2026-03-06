@@ -9,9 +9,14 @@ import BillingAndSOATab from "../FinancialSummary/BillingAndSOATab";
 import ServiceHierarchyCard from "../HardwareDetails/ServiceHierarchyCard";
 import KittyRedemptionPanel from "../PackageTool/KittyRedemptionPanel";
 import PromoOffersList from "../PackageTool/PromoOffersList";
+import FestiveOffersTab from "../PackageTool/FestiveOffersTab";
 import ComplaintHistoryTab from "../CallHandling/ComplaintHistoryTab";
 import PostpaidConversionForm from "../Recharge/PostpaidConversionForm";
 import MODDashboardTab from "../MOD/MODDashboardTab";
+import HardwareManagementTab from "../HardwareDetails/HardwareManagementTab";
+import WatchoDashboardTab from "../Watcho/WatchoDashboardTab";
+import LoyaltyOverviewCard from "../FinancialSummary/LoyaltyOverviewCard";
+import CommunicationHistoryTab from "../CallHandling/CommunicationHistoryTab";
 
 interface UnifiedTabsProps {
   historyData: any;
@@ -27,10 +32,12 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
     { id: "timeline", label: "History Timeline" },
     { id: "contact", label: "Contact Details 🆕" },
     { id: "packages", label: "Package Tool" },
+    { id: "watcho", label: "Watcho 📱" },
     { id: "mod", label: "Movies & PPV 🎬" },
     { id: "complaints", label: "Tickets & Service 🎫" },
     { id: "promos", label: "Offers & Promos 🎁" },
     { id: "migration", label: "Migration 🔄" },
+    { id: "comm", label: "Communications 💬" },
     { id: "call", label: "Call Handling" },
     { id: "service", label: "Hardware History" },
     { id: "billing", label: "Billing & SOA" },
@@ -93,21 +100,38 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
         {activeTab === "overview" && (
           <div
             style={{
-              padding: "32px",
-              textAlign: "center",
-              color: "var(--text-secondary)",
+              padding: "16px",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
             }}
           >
-            <h3>360 Overview</h3>
-            <p style={{ marginTop: "8px" }}>
-              Consolidated view of active packages, recent alerts, and account
-              health.
-            </p>
+            <LoyaltyOverviewCard vcNumber={vcNumber} />
+            <div
+              style={{
+                padding: "32px",
+                textAlign: "center",
+                color: "var(--text-secondary)",
+                background: "#f8fafc",
+                borderRadius: "12px",
+                border: "1px dashed var(--border-subtle)",
+              }}
+            >
+              <h3>360 Overview</h3>
+              <p style={{ marginTop: "8px" }}>
+                Consolidated view of active packages, recent alerts, and account
+                health.
+              </p>
+            </div>
           </div>
         )}
 
         {activeTab === "packages" && (
           <PackageToolBox vcNumber={vcNumber} smsId={smsId} />
+        )}
+
+        {activeTab === "watcho" && (
+          <WatchoDashboardTab vcNumber={vcNumber} />
         )}
 
         {activeTab === "mod" && (
@@ -120,7 +144,10 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
 
         {activeTab === "promos" && (
           <div style={{ padding: "16px" }}>
-            <KittyRedemptionPanel smsId={smsId} />
+            <FestiveOffersTab smsId={smsId} vcNumber={vcNumber} />
+            <div style={{ marginTop: "24px" }}>
+              <KittyRedemptionPanel smsId={smsId} />
+            </div>
             <div style={{ marginTop: "24px" }}>
               <PromoOffersList smsId={smsId} />
             </div>
@@ -135,6 +162,10 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
               onSuccess={(id) => alert(`Lead ${id} submitted for Postpaid Conversion!`)} 
             />
           </div>
+        )}
+
+        {activeTab === "comm" && (
+          <CommunicationHistoryTab vcNumber={vcNumber} />
         )}
 
         {activeTab === "call" && (
@@ -152,17 +183,8 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
         {activeTab === "service" && (
           <div style={{ padding: "16px" }}>
             <ServiceHierarchyCard vcNumber={vcNumber} />
-            <div
-              style={{
-                padding: "32px",
-                textAlign: "center",
-                color: "var(--text-secondary)",
-              }}
-            >
-              <h3>Service & Hardware</h3>
-              <p style={{ marginTop: "8px" }}>
-                DVR, INS Requests, Installation, and Technical Escalations.
-              </p>
+            <div style={{ marginTop: "24px" }}>
+              <HardwareManagementTab vcNumber={vcNumber} mobileNo={historyData?.customer?.contact?.rmn || "9999900001"} />
             </div>
           </div>
         )}
