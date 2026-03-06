@@ -22,6 +22,7 @@ export interface OTPRequest {
   expiresAt: Date;
   isValidated: boolean;
   source: string;
+  agentId: string;
 }
 
 export interface SMSVendor {

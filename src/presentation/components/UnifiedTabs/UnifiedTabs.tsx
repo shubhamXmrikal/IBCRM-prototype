@@ -170,7 +170,7 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
 
         {activeTab === "call" && (
           <div style={{ padding: "16px" }}>
-            <CallTaggingPanel vcNumber={vcNumber} agentId="AGENT_001" onSuccess={() => setActiveTab("timeline")} />
+            <CallTaggingPanel vcNumber={vcNumber} smsId={smsId} agentId="AGENT_001" onSuccess={() => setActiveTab("timeline")} />
           </div>
         )}
 
@@ -191,7 +191,7 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
 
         {activeTab === "billing" && (
           <div style={{ padding: "16px" }}>
-            <BillingAndSOATab vcNumber={vcNumber} />
+            <BillingAndSOATab vcNumber={vcNumber} smsId={smsId} />
           </div>
         )}
       </div>

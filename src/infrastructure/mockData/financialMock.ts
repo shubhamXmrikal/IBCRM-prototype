@@ -1,4 +1,4 @@
-import { SOAHeader, SOATransaction, ServiceEntity, ChannelDetail, GeographyMaster } from "../../domain/package/FinancialTypes";
+import { SOAHeader, SOATransaction, ServiceEntity, ChannelDetail, GeographyMaster, WaiverReason, WaiverRequest, PaymentReceipt, OutstandingBalance } from "../../domain/package/FinancialTypes";
 
 // ── SOA Header Mock for Rahul Sharma ──────────────────────────────────────
 export const mockSOAHeader: Record<string, SOAHeader> = {
