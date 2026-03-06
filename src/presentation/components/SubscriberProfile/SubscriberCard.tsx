@@ -43,6 +43,18 @@ export default function SubscriberCard({ customer }: SubscriberCardProps) {
       fontSize: "11px",
       color: "var(--text-secondary)",
     },
+    actionBtn: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      padding: "4px",
+      fontSize: "16px",
+      borderRadius: "4px",
+      transition: "background 0.2s",
+      ":hover": {
+        background: "var(--bg-hover)",
+      }
+    } as React.CSSProperties,
   };
 
   return (
@@ -95,10 +107,11 @@ export default function SubscriberCard({ customer }: SubscriberCardProps) {
             d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"
           />
         </svg>
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={styles.contactValue}>{localContact.mobile || "NA"}</div>
           <div style={styles.contactLabel}>Registered Mobile</div>
         </div>
+        <button title="Call Mobile" style={styles.actionBtn}>📞</button>
       </div>
 
       <div style={styles.contactRow}>
@@ -108,13 +121,54 @@ export default function SubscriberCard({ customer }: SubscriberCardProps) {
             d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
           />
         </svg>
-        <div>
+        <div style={{ flex: 1 }}>
           <div style={styles.contactValue}>
             {localContact.email || "Not Available"}
           </div>
           <div style={styles.contactLabel}>Email Address</div>
         </div>
+        <button title="Send Email" style={styles.actionBtn}>✉️</button>
       </div>
+
+      {customer.contact.facebook && (
+        <div style={styles.contactRow}>
+          <span style={styles.icon}>📘</span>
+          <div style={{ flex: 1 }}>
+            <div style={styles.contactValue}>{customer.contact.facebook}</div>
+            <div style={styles.contactLabel}>Facebook</div>
+          </div>
+        </div>
+      )}
+
+      {customer.contact.twitter && (
+        <div style={styles.contactRow}>
+          <span style={styles.icon}>🐦</span>
+          <div style={{ flex: 1 }}>
+            <div style={styles.contactValue}>{customer.contact.twitter}</div>
+            <div style={styles.contactLabel}>Twitter</div>
+          </div>
+        </div>
+      )}
+
+      {customer.contact.linkedin && (
+        <div style={styles.contactRow}>
+          <span style={styles.icon}>🔗</span>
+          <div style={{ flex: 1 }}>
+            <div style={styles.contactValue}>{customer.contact.linkedin}</div>
+            <div style={styles.contactLabel}>LinkedIn</div>
+          </div>
+        </div>
+      )}
+
+      {customer.contact.telephoneOff && (
+        <div style={styles.contactRow}>
+          <span style={styles.icon}>🏢</span>
+          <div style={{ flex: 1 }}>
+            <div style={styles.contactValue}>{customer.contact.telephoneOff}</div>
+            <div style={styles.contactLabel}>Office Phone</div>
+          </div>
+        </div>
+      )}
 
       <div
         style={{

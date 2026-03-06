@@ -3,19 +3,37 @@ import {
   Interaction,
   ServiceRequest,
 } from "../../../domain/interaction/Interaction";
+import { OutboundCampaignEntry } from "../../../domain/call/CallHandlingTypes";
 
 interface HistoryTimelineProps {
   interactions: Interaction[];
   serviceRequests: ServiceRequest[];
+  outboundCampaigns?: OutboundCampaignEntry[];
 }
 
 export default function HistoryTimeline({
   interactions,
   serviceRequests,
+  outboundCampaigns = [],
 }: HistoryTimelineProps) {
-  // Combine and sort by date descending
-  const allEvents = [...interactions, ...serviceRequests].sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
+  // Combine all types of events and sort by date descending
+  // We map them to a common structure for sorting
+  const allEvents = [
+    ...interactions.map(i => ({ ...i, sortDate: new Date(i.date), kind: "INTERACTION" })),
+    ...serviceRequests.map(s => ({ ...s, sortDate: new Date(s.date), kind: "SERVICE" })),
+    ...outboundCampaigns.map(c => ({ 
+      id: c.id, 
+      type: "OUTBOUND", 
+      date: c.callDate, 
+      category: c.campaignName, 
+      notes: c.feedback, 
+      status: c.status, 
+      agentName: c.agentName,
+      sortDate: new Date(c.callDate), 
+      kind: "CAMPAIGN" 
+    }))
+  ].sort((a, b) => {
+    return b.sortDate.getTime() - a.sortDate.getTime();
   });
 
   if (allEvents.length === 0) {
@@ -44,6 +62,7 @@ export default function HistoryTimeline({
         <select className="input-field" style={{ width: "150px" }}>
           <option value="ALL">All Types</option>
           <option value="INBOUND">Inbound Calls</option>
+          <option value="OUTBOUND">Campaign Calls</option>
           <option value="SMS">SMS</option>
           <option value="SERVICE">Service Requests</option>
         </select>
@@ -51,15 +70,16 @@ export default function HistoryTimeline({
 
       <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
         {allEvents.map((event: any) => {
-          const isInteraction = "category" in event;
           const typeBadgeColor =
             event.type === "INBOUND"
               ? "#3b82f6"
               : event.type === "SMS"
                 ? "#ea580c"
-                : event.type === "INSTALLATION" || event.type === "REPAIR"
-                  ? "#10b981"
-                  : "#64748b";
+                : event.type === "OUTBOUND"
+                  ? "#8b5cf6"
+                  : event.type === "INSTALLATION" || event.type === "REPAIR"
+                    ? "#10b981"
+                    : "#64748b";
 
           return (
             <div
@@ -70,7 +90,7 @@ export default function HistoryTimeline({
                 padding: "16px",
                 border: "1px solid var(--border-subtle)",
                 borderRadius: "var(--radius-md)",
-                backgroundColor: "#fafafa",
+                backgroundColor: event.kind === "CAMPAIGN" ? "#f5f3ff" : "#fafafa",
               }}
             >
               <div
@@ -128,7 +148,7 @@ export default function HistoryTimeline({
                       fontSize: "12px",
                       fontWeight: 600,
                       color:
-                        event.status === "CLOSED" || event.status === "RESOLVED"
+                        event.status === "CLOSED" || event.status === "RESOLVED" || event.status === "CONNECTED"
                           ? "#16a34a"
                           : "#d97706",
                     }}
@@ -138,10 +158,10 @@ export default function HistoryTimeline({
                 </div>
 
                 <h4 style={{ fontSize: "13px", marginBottom: "4px" }}>
-                  {isInteraction ? event.category : "Service Request"}
+                  {event.category || (event.kind === "SERVICE" ? "Service Request" : "Call")}
                 </h4>
                 <p style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
-                  {isInteraction ? event.notes : event.resolutionRemarks}
+                  {event.notes || event.resolutionRemarks}
                 </p>
 
                 <div
@@ -153,8 +173,8 @@ export default function HistoryTimeline({
                     gap: "16px",
                   }}
                 >
-                  {isInteraction && <span>Agent: {event.agentName}</span>}
-                  {!isInteraction && event.technicianId && (
+                  {event.agentName && <span>Agent: {event.agentName}</span>}
+                  {event.technicianId && (
                     <span>Technician: {event.technicianId}</span>
                   )}
                 </div>

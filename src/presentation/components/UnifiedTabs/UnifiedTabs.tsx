@@ -3,19 +3,24 @@
 import React, { useState } from "react";
 import HistoryTimeline from "../HistoryTimeline/HistoryTimeline";
 import PackageToolBox from "../PackageTool/PackageToolBox";
+import CallTaggingPanel from "../CallHandling/CallTaggingPanel";
+import AlternateMobilesPanel from "../ContactUpdate/AlternateMobilesPanel";
 
 interface UnifiedTabsProps {
   historyData: any;
   vcNumber: string;
+  smsId: string;
 }
 
-export default function UnifiedTabs({ historyData, vcNumber }: UnifiedTabsProps) {
+export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTabsProps) {
   const [activeTab, setActiveTab] = useState("timeline");
 
   const tabs = [
     { id: "overview", label: "360 Overview" },
     { id: "timeline", label: "History Timeline" },
+    { id: "contact", label: "Contact Details 🆕" },
     { id: "packages", label: "Package Tool" },
+    { id: "call", label: "Call Handling" },
     { id: "service", label: "Service & Hardware" },
     { id: "billing", label: "Billing & SOA" },
   ];
@@ -92,6 +97,18 @@ export default function UnifiedTabs({ historyData, vcNumber }: UnifiedTabsProps)
 
         {activeTab === "packages" && (
           <PackageToolBox vcNumber={vcNumber} />
+        )}
+
+        {activeTab === "call" && (
+          <div style={{ padding: "16px" }}>
+            <CallTaggingPanel vcNumber={vcNumber} agentId="AGENT_001" onSuccess={() => setActiveTab("timeline")} />
+          </div>
+        )}
+
+        {activeTab === "contact" && (
+          <div style={{ padding: "16px" }}>
+            <AlternateMobilesPanel smsId={smsId} vcNo={vcNumber} />
+          </div>
         )}
 
         {activeTab === "service" && (

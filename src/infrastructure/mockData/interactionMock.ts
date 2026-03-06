@@ -57,3 +57,24 @@ export const mockServiceRequests: ServiceRequest[] = [
     resolutionRemarks: "Signal issue resolved. Dish realigned.",
   },
 ];
+
+export const mockOutboundCampaigns = [
+  {
+    id: "OB-7721",
+    vcNumber: "02563029393", // JAFFER
+    campaignName: "Retention Q1 2026",
+    callDate: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+    status: "CONNECTED",
+    agentName: "Suresh M.",
+    feedback: "Customer interested in base pack upgrade next month.",
+  },
+  {
+    id: "OB-8892",
+    vcNumber: "09100000001", // RAHUL
+    campaignName: "HD Upsell",
+    callDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    status: "NO_ANSWER",
+    agentName: "System",
+    feedback: "Automated dialer attempt failed.",
+  },
+];

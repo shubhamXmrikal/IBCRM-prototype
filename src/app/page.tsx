@@ -13,6 +13,7 @@ import DisambiguationModal from "../presentation/components/DisambiguationModal/
 import GoMultiPanel from "../presentation/components/GoMultiPanel/GoMultiPanel";
 import { Customer } from "../domain/customer/Customer";
 import { Interaction, ServiceRequest } from "../domain/interaction/Interaction";
+import { OutboundCampaignEntry } from "../domain/call/CallHandlingTypes";
 import {
   SearchType,
   SearchSubsDetails,
@@ -26,6 +27,7 @@ export default function Customer360Page() {
   const [goMulti, setGoMulti] = useState<GoMultiResult | null>(null);
   const [interactions, setInteractions] = useState<Interaction[]>([]);
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
+  const [outboundCampaigns, setOutboundCampaigns] = useState<OutboundCampaignEntry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -74,6 +76,7 @@ export default function Customer360Page() {
       setGoMulti(data.goMulti ?? null);
       setInteractions(data.history?.interactions ?? []);
       setServiceRequests(data.history?.serviceRequests ?? []);
+      setOutboundCampaigns(data.history?.outboundCampaigns ?? []);
     } catch (err: any) {
       setError(err.message ?? "Error fetching data");
     } finally {
@@ -185,7 +188,11 @@ export default function Customer360Page() {
 
               {/* Unified Tabs & History Timeline */}
               <div style={{ marginTop: "12px", height: "500px" }}>
-                <UnifiedTabs historyData={{ interactions, serviceRequests }} vcNumber={customer.vcNumber} />
+                <UnifiedTabs 
+                  historyData={{ interactions, serviceRequests, outboundCampaigns }} 
+                  vcNumber={customer.vcNumber} 
+                  smsId={customer.smsId}
+                />
               </div>
             </div>
           )}

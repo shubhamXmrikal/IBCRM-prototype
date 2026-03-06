@@ -34,8 +34,13 @@ export interface Customer {
     mobile2?: string; // PhoneMobile2
     mobile3?: string; // PhoneMobile3
     email: string; // email
+    isEmailConfirmed: boolean; // IsEmailConfirmed
     telephoneRes?: string; // PhoneRes
     telephoneOff?: string; // phoneOffic
+    facebook?: string; // Facebook
+    twitter?: string; // Twitter
+    linkedin?: string; // Linked_in
+    termsOfConsent: boolean; // TOC
     // Which mobile slots are RMN-registered
     isRMNMob1: boolean; // IsRMNMob1
     isRMNMob2: boolean; // IsRMNMob2

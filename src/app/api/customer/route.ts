@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SearchCustomerUseCase } from "../../../application/useCases/SearchCustomer";
-import { MockInteractionRepository } from "../../../infrastructure/apiClients/MockInteractionRepository";
+import { GetUnifiedHistoryUseCase } from "../../../application/useCases/GetUnifiedHistory";
 import { SearchType } from "../../../domain/customer/SubscriberSearchTypes";
 
 /**
@@ -64,9 +64,10 @@ export async function GET(request: Request) {
     }
 
     // ── single — return full 360 payload ──────────────────────────────────
-    const interactionRepo = new MockInteractionRepository();
-    const history = await interactionRepo.getHistoryByCustomerId(
+    const historyUseCase = new GetUnifiedHistoryUseCase();
+    const history = await historyUseCase.execute(
       result.subscriber.id,
+      result.subscriber.vcNumber
     );
 
     return NextResponse.json(
