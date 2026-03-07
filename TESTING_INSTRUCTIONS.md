@@ -83,17 +83,31 @@ Search for **Rahul Sharma** (`VC: 09100000001`). Rahul currently has a `PENDING`
 5. Click **Verify Caller**.
 6. **Expected Result:** The modal closes, and the "Schedule Temp Deactivation" modal opens automatically.
 
-### Scenario C: Temp Deactivation
+### Scenario C: Modernized Temp Deactivation
 
-_(Assume you successfully verified Rahul or are viewing Jaffer who is already verified)_
+This module is located in the **Bottom Toolbar** and features real-time duration calculations and a mandatory verification checklist.
 
-1. Click **"Temp Deactivation"**.
-2. Select a Start Date (e.g., tomorrow) and an End Date.
-3. **Validation Rule:** Try setting the end date only 2 days after the start date and click Submit.
-   - **Expected Result:** An error message "Suspension must be at least 5 days" appears.
-4. Set the end date 6 days after the start date and check the "Ramadan Special Opt-In" box.
-5. Click Submit.
-6. **Expected Result:** A success alert appears.
+1. **Locate Trigger**: At the bottom of the screen, click the **"PKG/CNX/PMT"** dropdown and select **"Temp Deactivation"**.
+2. **Verify Eligibility**:
+   - Search for **Rahul Sharma** (`VC: 09100000001`). Open the tool. The form should be active.
+   - Search for a mock subscriber with **TOC: 10025** (Pick by Channel) or **10026** (Airport). 
+   - **Expected Result**: The modal displays a red "Ineligible" alert and hides the form.
+3. **Real-time Calculation**:
+   - Enter `15` in the **Number of Days** field.
+   - Change the **Deactivation From** date.
+   - **Expected Result**: The "Deactivation To" and "Reactivation Date" (To + 1) update automatically in real-time.
+4. **Validation Logic**:
+   - Enter `2` in the Number of Days.
+   - **Expected Result**: The Submit button remains disabled, and the input field enforces the HTML5 `min="5"` attribute.
+5. **Mandatory Checklist**:
+   - Fill in valid dates (e.g., 15 days).
+   - Try to click **Submit Request** without checking the boxes.
+   - **Expected Result**: The button is disabled (`#cbd5e1` gray).
+   - Check all three boxes in the **Mandatory Checklist** section.
+   - **Expected Result**: The button turns orange (`#f97316`) and becomes clickable.
+6. **Submission**:
+   - Click **Submit Request**.
+   - **Expected Result**: A success alert displays the summary of the request including the calculated reactivation date.
 
 ### Scenario D: Updating Contact Details
 
@@ -596,3 +610,79 @@ Search for **Rahul Sharma** (`VC: 09100000001`).
 1. Search for **Jaffer Resht** (`VC: 02563029393`).
 2. Click the VIP Eligibility badge.
 3. **Expected Result:** The modal shows **"❌ Not Eligible for VIP"** with the reason: "Monthly FMR below threshold...". The enrollment button is hidden.
+
+---
+
+## 19. Testing Agent Workspace Utilities (Right Icon Bar)
+
+The right side of the screen contains a vertical bar with quick-access icons for agent-specific utilities.
+
+### Scenario A: Agent Presence & Face Matching (Camera)
+
+1. Locate the **Right Icon Bar** (persistent vertical bar on the far right).
+2. Hover over the **Camera / CCTV icon** (2nd icon from the top).
+3. **Expected Result:** 
+   - A slide-out panel titled **"Face Matching / CCTV"** appears.
+   - A dark "viewfinder" area is visible with a pulsing red **"LIVE"** indicator.
+   - A blue **scanning line** moves up and down the viewfinder (simulating an active scan).
+   - The status badge shows 🟡 **"Verification Pending"** (using the `--color-warning` token).
+
+### Scenario B: Manual Verification Override (Prototype)
+
+1. With the Camera flyout open, click the **"Verify"** button.
+2. **Expected Result:** 
+   - The status badge turns 🟢 **"Identity Verified"** (using the `--color-success` token).
+   - The **Match Score** updates from `--` to **98.4%**.
+   - The scanning animation stops.
+3. Click the **"Reset"** button.
+4. **Expected Result:** The status returns to 🟡 **"Verification Pending"**.
+5. Click the **"Reset"** button again (to simulate failure).
+6. **Expected Result:** The status badge turns 🔴 **"Verification Failed"** (using the `--color-critical` token).
+
+### Scenario C: Agent Shortcuts & Quick Actions
+
+1. Hover over the **Grid icon** (6th icon from the top).
+2. **Expected Result:** A panel titled **"Agent Shortcuts"** appears containing a high-density grid of 25+ actions (Pay Later, Care Desk Waiver, etc.).
+3. Hover over the **Status Dots icon** (7th icon from the top).
+4. **Expected Result:** A panel titled **"Watcho Actions"** appears with OTT-specific shortcuts.
+5. **UX Check:** Verify that moving the mouse away from the icons closes the panels immediately, and the subscriber's main profile is never obscured by a permanent window (adhering to the Slide-out Panel benchmark).
+
+---
+
+## 20. Testing Technical Troubleshooting (Module 18)
+
+This module replicates the guided diagnostic flows for resolving subscriber technical issues.
+
+### Scenario A: Troubleshooting Navigation
+
+1. Hover over the **Wrench icon** (9th icon from the top).
+2. **Expected Result:** 
+   - A large slide-out panel (800px wide) titled **"Technical Troubleshooting"** appears.
+   - The left side shows the **Troubleshooting Categories**.
+   - The right side shows an empty state: **"Select a category to start troubleshooting"**.
+
+### Scenario B: Dynamic Category Toggling
+
+1. Inside the troubleshooting flyout, click the **"SWITCH TO SMRT STICK"** button.
+2. **Expected Result:** The list updates to show SMRT Stick-specific calls (e.g., "NO INTERNET").
+3. Click **"SWITCH TO STANDARD"** to return to the main list.
+
+### Scenario C: Guided Diagnostic Flow (101. CHANNEL NOT SUBSCRIBED)
+
+1. Select **"101. CHANNEL NOT SUBSCRIBED"** from the sidebar.
+2. **Step 1 (VC STATUS CHECK)**: 
+   - Observe the agent script in the green box.
+   - Click **"YES, ACTIVE"**.
+3. **Step 2 (FRONT OF TV CHECK)**: 
+   - Click **"YES"**.
+4. **Step 3 (ERROR MESSAGE PROBE)**: 
+   - Observe the **Accumulated Case History** at the bottom: `VC Status: Active -> Customer in front of TV`.
+   - Click **"101. NOT SUBSCRIBED"**.
+5. **Expected Result:** 
+   - A completion alert appears with the full Case History: `VC Status: Active -> Customer in front of TV -> Error 101. Triggered automated refresh.`.
+   - The diagnostic view resets to the empty state.
+
+### Scenario D: Missing Diagnostic Page (Prototype State)
+
+1. Select any other category (e.g., **"102. NO ACCOUNT BALANCE"**).
+2. **Expected Result:** The right panel shows an **"Under Construction"** message with guidance to use the "101" category for testing.

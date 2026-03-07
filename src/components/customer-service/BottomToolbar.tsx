@@ -1,9 +1,11 @@
 "use client";
 
 import React from "react";
+import TempDeactivationModal from "./TempDeactivationModal";
 
 type DropdownItem = {
   label: string;
+  onClick?: () => void;
 };
 
 interface DropdownButtonProps {
@@ -29,9 +31,13 @@ function DropdownButton({ label, items }: DropdownButtonProps) {
   const [open, setOpen] = React.useState(false);
 
   const handleItemClick = (item: DropdownItem) => {
-    // Placeholder behaviour
-    // eslint-disable-next-line no-console
-    console.log(`Bottom toolbar action: ${label} -> ${item.label}`);
+    if (item.onClick) {
+      item.onClick();
+    } else {
+      // Placeholder behaviour
+      // eslint-disable-next-line no-console
+      console.log(`Bottom toolbar action: ${label} -> ${item.label}`);
+    }
     setOpen(false);
   };
 
@@ -60,7 +66,7 @@ function DropdownButton({ label, items }: DropdownButtonProps) {
             border: "1px solid #e2e8f0",
             boxShadow:
               "0 12px 16px -4px rgba(15,23,42,0.25), 0 4px 6px -4px rgba(15,23,42,0.2)",
-            zIndex: 40,
+            zIndex: 1200,
           }}
         >
           {items.map((item) => (
@@ -98,6 +104,15 @@ function DropdownButton({ label, items }: DropdownButtonProps) {
 }
 
 export default function BottomToolbar() {
+  const [isTempDeactivationOpen, setIsTempDeactivationOpen] = React.useState(false);
+
+  // Mock subscriber data
+  const mockSubscriber = {
+    vcNo: "123456789012",
+    toc: "1001", // Standard
+    status: "Active",
+  };
+
   const handleClick = (label: string) => {
     // Placeholder direct action
     // eslint-disable-next-line no-console
@@ -117,7 +132,7 @@ export default function BottomToolbar() {
         display: "flex",
         alignItems: "center",
         gap: 8,
-        zIndex: 30,
+        zIndex: 1100,
       }}
     >
       {/* Direct buttons */}
@@ -248,7 +263,14 @@ export default function BottomToolbar() {
           { label: "Recharge Offer" },
           { label: "Payment Transfer/VC Termination" },
           { label: "Price Protection" },
+          { label: "Temp Deactivation", onClick: () => setIsTempDeactivationOpen(true) },
         ]}
+      />
+
+      <TempDeactivationModal
+        isOpen={isTempDeactivationOpen}
+        onClose={() => setIsTempDeactivationOpen(false)}
+        subscriberInfo={mockSubscriber}
       />
     </div>
   );

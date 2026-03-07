@@ -11,7 +11,8 @@ type IconKey =
   | "Grid"
   | "Status Dots"
   | "Watcho"
-  | "Settings";
+  | "Settings"
+  | "Troubleshooting";
 
 interface IconButtonConfig {
   key: IconKey;
@@ -29,6 +30,20 @@ function UserIcon({ color }: { color: string }) {
         stroke={color}
         strokeWidth="1.8"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function WrenchIcon({ color }: { color: string }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+      <path
+        d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.77 3.77Z"
+        stroke={color}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   );
@@ -113,10 +128,42 @@ function BanIcon({ color }: { color: string }) {
 function GridIcon({ color }: { color: string }) {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <rect x="5" y="5" width="6" height="6" rx="1" stroke={color} strokeWidth="1.8" />
-      <rect x="13" y="5" width="6" height="6" rx="1" stroke={color} strokeWidth="1.8" />
-      <rect x="5" y="13" width="6" height="6" rx="1" stroke={color} strokeWidth="1.8" />
-      <rect x="13" y="13" width="6" height="6" rx="1" stroke={color} strokeWidth="1.8" />
+      <rect
+        x="5"
+        y="5"
+        width="6"
+        height="6"
+        rx="1"
+        stroke={color}
+        strokeWidth="1.8"
+      />
+      <rect
+        x="13"
+        y="5"
+        width="6"
+        height="6"
+        rx="1"
+        stroke={color}
+        strokeWidth="1.8"
+      />
+      <rect
+        x="5"
+        y="13"
+        width="6"
+        height="6"
+        rx="1"
+        stroke={color}
+        strokeWidth="1.8"
+      />
+      <rect
+        x="13"
+        y="13"
+        width="6"
+        height="6"
+        rx="1"
+        stroke={color}
+        strokeWidth="1.8"
+      />
     </svg>
   );
 }
@@ -170,17 +217,23 @@ const ICONS: IconButtonConfig[] = [
   {
     key: "Camera / CCTV",
     tooltip: "Camera / CCTV",
-    renderIcon: (active) => <CameraIcon color={active ? "#ffffff" : "#0f172a"} />,
+    renderIcon: (active) => (
+      <CameraIcon color={active ? "#ffffff" : "#0f172a"} />
+    ),
   },
   {
     key: "View Profile",
     tooltip: "View Profile",
-    renderIcon: (active) => <ContactIcon color={active ? "#ffffff" : "#0f172a"} />,
+    renderIcon: (active) => (
+      <ContactIcon color={active ? "#ffffff" : "#0f172a"} />
+    ),
   },
   {
     key: "Person",
     tooltip: "Person",
-    renderIcon: (active) => <UserCircleIcon color={active ? "#ffffff" : "#0f172a"} />,
+    renderIcon: (active) => (
+      <UserCircleIcon color={active ? "#ffffff" : "#0f172a"} />
+    ),
   },
   {
     key: "Block / DNC",
@@ -195,13 +248,20 @@ const ICONS: IconButtonConfig[] = [
   {
     key: "Status Dots",
     tooltip: "Status Dots",
-    renderIcon: (active) => <MoreHorizontalIcon color={active ? "#ffffff" : "#0f172a"} />,
+    renderIcon: (active) => (
+      <MoreHorizontalIcon color={active ? "#ffffff" : "#0f172a"} />
+    ),
   },
   {
     key: "Watcho",
     tooltip: "Watcho",
+    renderIcon: (active) => <PlayIcon color={active ? "#ffffff" : "#7c3aed"} />,
+  },
+  {
+    key: "Troubleshooting",
+    tooltip: "Troubleshooting",
     renderIcon: (active) => (
-      <PlayIcon color={active ? "#ffffff" : "#7c3aed"} />
+      <WrenchIcon color={active ? "#ffffff" : "#0f172a"} />
     ),
   },
   {
@@ -257,17 +317,24 @@ export default function RightIconBar() {
           position: "relative",
         };
 
-        const showProfilePanel = hoveredKey === "Agent Profile" && config.key === "Agent Profile";
+        const showProfilePanel =
+          hoveredKey === "Agent Profile" && config.key === "Agent Profile";
         const showGridPanel = hoveredKey === "Grid" && config.key === "Grid";
         const showWatchoPanel =
           hoveredKey === "Status Dots" && config.key === "Status Dots";
+        const showCameraPanel =
+          hoveredKey === "Camera / CCTV" && config.key === "Camera / CCTV";
+        const showTroublePanel =
+          hoveredKey === "Troubleshooting" && config.key === "Troubleshooting";
 
         return (
           <div
             key={config.key}
             style={{ position: "relative" }}
             onMouseEnter={() => setHoveredKey(config.key)}
-            onMouseLeave={() => setHoveredKey((prev) => (prev === config.key ? null : prev))}
+            onMouseLeave={() =>
+              setHoveredKey((prev) => (prev === config.key ? null : prev))
+            }
           >
             <button
               type="button"
@@ -283,10 +350,16 @@ export default function RightIconBar() {
 
             {showWatchoPanel && <WatchoFlyout />}
 
+            {showCameraPanel && <CameraFlyout />}
+
+            {showTroublePanel && <TroubleshootingFlyout />}
+
             {hoveredKey === config.key &&
               !showProfilePanel &&
               !showGridPanel &&
-              !showWatchoPanel && (
+              !showWatchoPanel &&
+              !showCameraPanel &&
+              !showTroublePanel && (
                 <div
                   style={{
                     position: "absolute",
@@ -317,10 +390,12 @@ function FlyoutCard({
   title,
   children,
   width = 360,
+  headerColor = "#f97316",
 }: {
   title: string;
   children: React.ReactNode;
   width?: number;
+  headerColor?: string;
 }) {
   return (
     <div
@@ -340,7 +415,7 @@ function FlyoutCard({
     >
       <div
         style={{
-          backgroundColor: "#f97316",
+          backgroundColor: headerColor,
           color: "#ffffff",
           padding: "6px 10px",
           fontSize: 12,
@@ -369,6 +444,215 @@ function FlyoutCard({
         {children}
       </div>
     </div>
+  );
+}
+
+function CameraFlyout() {
+  const [status, setStatus] = React.useState<"pending" | "success" | "error">(
+    "pending",
+  );
+
+  const statusColors = {
+    pending: "#f59e0b", // --color-warning
+    success: "#22c55e", // --color-success
+    error: "#ef4444", // --color-critical
+  };
+
+  const statusLabels = {
+    pending: "Verification Pending",
+    success: "Identity Verified",
+    error: "Verification Failed",
+  };
+
+  return (
+    <FlyoutCard title="Face Matching / CCTV" headerColor="#64748b">
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {/* Mock Camera Feed */}
+        <div
+          style={{
+            width: "100%",
+            height: 180,
+            backgroundColor: "#0f172a",
+            borderRadius: 4,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexDirection: "column",
+            position: "relative",
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 8,
+              left: 8,
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <div
+              style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                backgroundColor: "#ef4444",
+                animation: "pulse 1.5s infinite",
+              }}
+            />
+            <span style={{ color: "#ffffff", fontSize: 10, fontWeight: 600 }}>
+              LIVE
+            </span>
+          </div>
+          <CameraIcon color="#475569" />
+          <span
+            style={{
+              color: "#475569",
+              fontSize: 12,
+              marginTop: 8,
+              fontWeight: 500,
+            }}
+          >
+            AGENT CAMERA FEED
+          </span>
+
+          {/* Scanning Overlay */}
+          {status === "pending" && (
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                backgroundColor: "#3b82f6",
+                boxShadow: "0 0 10px #3b82f6",
+                animation: "scan 3s ease-in-out infinite",
+              }}
+            />
+          )}
+        </div>
+
+        {/* Status Badge */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "6px",
+            backgroundColor: `${statusColors[status]}15`,
+            border: `1px solid ${statusColors[status]}`,
+            borderRadius: 4,
+            gap: 8,
+          }}
+        >
+          <div
+            style={{
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              backgroundColor: statusColors[status],
+            }}
+          />
+          <span
+            style={{
+              color: statusColors[status],
+              fontWeight: 600,
+              fontSize: 12,
+            }}
+          >
+            {statusLabels[status]}
+          </span>
+        </div>
+
+        {/* Agent Info */}
+        <div
+          style={{
+            fontSize: 11,
+            color: "#64748b",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: 4,
+          }}
+        >
+          <div>
+            <strong>Agent:</strong> test0407
+          </div>
+          <div>
+            <strong>Mode:</strong> WFH
+          </div>
+          <div>
+            <strong>Match Score:</strong>{" "}
+            {status === "success" ? "98.4%" : "--"}
+          </div>
+          <div>
+            <strong>Last Check:</strong> 11:32:24
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+          <button
+            type="button"
+            onClick={() => setStatus("success")}
+            style={{
+              flex: 1,
+              padding: "8px",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              borderRadius: 4,
+              fontSize: 12,
+              cursor: "pointer",
+              fontWeight: 500,
+            }}
+          >
+            Verify
+          </button>
+          <button
+            type="button"
+            onClick={() => setStatus("error")}
+            style={{
+              flex: 1,
+              padding: "8px",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e2e8f0",
+              borderRadius: 4,
+              fontSize: 12,
+              cursor: "pointer",
+              fontWeight: 500,
+            }}
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes scan {
+          0% {
+            top: 0;
+          }
+          50% {
+            top: 100%;
+          }
+          100% {
+            top: 0;
+          }
+        }
+        @keyframes pulse {
+          0% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.4;
+          }
+          100% {
+            opacity: 1;
+          }
+        }
+      `}</style>
+    </FlyoutCard>
   );
 }
 
@@ -426,161 +710,87 @@ function ProfileFlyout() {
   );
 }
 
+import QuickActionsContainer from "../../presentation/quick-actions/QuickActionsContainer";
+
 function QuickActionsFlyout() {
-  const actions = [
-    "Pay Later",
-    "SMS Received",
-    "Call Closure",
-    "BackEnd Lead",
-    "Sent Email",
-    "Hotel Subs",
-    "Upd/Dwn Status",
-    "Change Status",
-    "EPRS Tran",
-    "E-COM Inst.",
-    "Adv Pkg Req",
-    "EPRS VC",
-    "Hotel Inst",
-    "Multi To Individual",
-    "Missed Call Details",
-    "Care Desk Waiver",
-    "Resend Waiver",
-    "OMM Blocking",
-    "Demo Regional",
-    "SMRT Stick Alexa OTA",
-    "Barebox Offer",
-    "OTT",
-    "Box Ser. Plan",
-    "NFDC MVOD",
-    "Zing Add-on Waiver",
-  ];
-
-  const handleClick = (label: string) => {
-    // eslint-disable-next-line no-console
-    console.log(`Quick action: ${label}`);
-  };
-
   return (
-    <FlyoutCard title="Agent Shortcuts" width={420}>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(5, 1fr)",
-          gap: 8,
-        }}
-      >
-        {actions.map((label) => (
-          <button
-            key={label}
-            type="button"
-            onClick={() => handleClick(label)}
-            style={{
-              height: 64,
-              borderRadius: 4,
-              border: "1px solid #e5e7eb",
-              backgroundColor: "#ffffff",
-              fontSize: 10,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "4px 2px",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "#fff7ed";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "#ffffff";
-            }}
-          >
-            <div
-              style={{
-                width: 26,
-                height: 26,
-                borderRadius: 4,
-                background:
-                  "linear-gradient(135deg, #fed7aa 0%, #f97316 60%, #7c2d12 100%)",
-                marginBottom: 4,
-              }}
-            />
-            <span style={{ textAlign: "center" }}>{label}</span>
-          </button>
-        ))}
+    <FlyoutCard title="Agent Shortcuts" width={800} headerColor="#f97316">
+      <div style={{ height: 500, margin: "-8px -10px" }}>
+        <QuickActionsContainer />
       </div>
     </FlyoutCard>
   );
 }
+
+import WatchoActionsContainer from "../../presentation/watcho/WatchoActionsContainer";
 
 function WatchoFlyout() {
-  const actions = [
-    "Watcho details",
-    "Watcho renewal",
-    "Watcho Auto Renewal Cancellation",
-    "Watcho Prospect",
-    "Freedom Plan",
-    "Activate Offer",
-  ];
-
-  const handleClick = (label: string) => {
-    // eslint-disable-next-line no-console
-    console.log(`Watcho action: ${label}`);
-  };
-
   return (
-    <FlyoutCard title="Watcho Actions" width={380}>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 8,
-        }}
-      >
-        {actions.map((label) => (
-          <button
-            key={label}
-            type="button"
-            onClick={() => handleClick(label)}
-            style={{
-              height: 72,
-              borderRadius: 4,
-              border: "1px solid #e5e7eb",
-              backgroundColor: "#ffffff",
-              fontSize: 10,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "4px 2px",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "#fff7ed";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor =
-                "#ffffff";
-            }}
-          >
-            <div
-              style={{
-                width: 30,
-                height: 30,
-                borderRadius: 4,
-                background:
-                  "linear-gradient(135deg, #ddd6fe 0%, #7c3aed 60%, #4c1d95 100%)",
-                marginBottom: 4,
-              }}
-            />
-            <span style={{ textAlign: "center" }}>{label}</span>
-          </button>
-        ))}
+    <FlyoutCard title="Watcho Actions" width={800} headerColor="#7c3aed">
+      <div style={{ height: 500, margin: "-8px -10px" }}>
+        <WatchoActionsContainer />
       </div>
     </FlyoutCard>
   );
 }
 
+import TroubleshootingSidebar from "../../presentation/troubleshooting/TroubleshootingSidebar";
+import DiagnosticContainer from "../../presentation/troubleshooting/DiagnosticContainer";
+import { TroubleshootingCategory } from "../../domain/troubleshooting/types";
 
+function TroubleshootingFlyout() {
+  const [selectedCategory, setSelectedCategory] =
+    React.useState<TroubleshootingCategory | null>(null);
+
+  const handleComplete = (history: string) => {
+    alert(`Troubleshooting Complete!\n\nCase History:\n${history}`);
+    setSelectedCategory(null);
+  };
+
+  return (
+    <FlyoutCard
+      title="Technical Troubleshooting"
+      width={800}
+      headerColor="#3b82f6"
+    >
+      <div style={{ display: "flex", height: 500, margin: "-8px -10px" }}>
+        <TroubleshootingSidebar
+          onSelectCategory={setSelectedCategory}
+          selectedCategoryId={selectedCategory?.id}
+        />
+        <div style={{ flex: 1, backgroundColor: "#ffffff" }}>
+          {selectedCategory ? (
+            <DiagnosticContainer
+              key={selectedCategory.id}
+              category={selectedCategory}
+              onComplete={handleComplete}
+            />
+          ) : (
+            <div
+              style={{
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexDirection: "column",
+                color: "#94a3b8",
+                padding: "40px",
+                textAlign: "center",
+              }}
+            >
+              <WrenchIcon color="#e2e8f0" />
+              <div
+                style={{ fontSize: "16px", fontWeight: 600, marginTop: "12px" }}
+              >
+                Select a category to start troubleshooting
+              </div>
+              <p style={{ fontSize: "13px", marginTop: "8px" }}>
+                Probing the subscriber's issue using guided diagnostic steps.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </FlyoutCard>
+  );
+}
