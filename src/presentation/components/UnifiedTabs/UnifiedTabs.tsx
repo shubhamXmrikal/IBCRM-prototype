@@ -144,9 +144,9 @@ export default function UnifiedTabs({ historyData, vcNumber, smsId }: UnifiedTab
 
         {activeTab === "promos" && (
           <div style={{ padding: "16px" }}>
-            <FestiveOffersTab smsId={smsId} vcNumber={vcNumber} />
+            <FestiveOffersTab vcNumber={vcNumber} />
             <div style={{ marginTop: "24px" }}>
-              <KittyRedemptionPanel smsId={smsId} />
+              <KittyRedemptionPanel vcNumber={vcNumber} />
             </div>
             <div style={{ marginTop: "24px" }}>
               <PromoOffersList smsId={smsId} />
