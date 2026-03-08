@@ -53,7 +53,16 @@ module.exports = {
       fontSize: {
         'xxs': '0.625rem', // 10px
         'tiny': '0.75rem', // 12px
-      }
+      },
+      keyframes: {
+        scan: {
+          '0%, 100%': { top: '0%' },
+          '50%': { top: '100%' },
+        },
+      },
+      animation: {
+        scan: 'scan 3s ease-in-out infinite',
+      },
     },
   },
   plugins: [],

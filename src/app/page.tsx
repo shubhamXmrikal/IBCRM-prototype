@@ -24,6 +24,7 @@ import AgentGlobalToolbar from "../presentation/components/CallHandling/AgentGlo
 import MOTDBanner from "../presentation/components/SubscriberProfile/MOTDBanner";
 import { useAgentStore } from "../store/useAgentStore";
 import ActionDrawer from "../presentation/components/Drawers/ActionDrawer";
+import RightIconBar from "../presentation/layouts/UtilityBar/RightIconBar";
 import { Zap, LayoutGrid, ListFilter, AlertCircle } from "lucide-react";
 import { cn } from "../lib/utils";
 
@@ -117,7 +118,7 @@ export default function Customer360Page() {
         theme === 'dark' ? "bg-[#0B0F1A] text-slate-200" : "bg-slate-50 text-slate-900"
       )}
       style={{
-        gridTemplateColumns: `64px 1fr ${isRightPanelOpen ? (isDrawerExpanded ? '500px' : '320px') : '0px'}`
+        gridTemplateColumns: `64px 1fr ${isRightPanelOpen ? (isDrawerExpanded ? '500px' : '320px') : '0px'} 44px`
       }}
     >
       {/* PANEL 1: SLIM NAV */}
@@ -222,15 +223,15 @@ export default function Customer360Page() {
 
       {showRecharge && activeCustomer && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl shadow-2xl border border-white/10">
-            <RechargeWorkflowPanel 
-              vcNumber={activeCustomer.vcNumber} 
-              smsId={activeCustomer.smsId} 
-              onClose={() => setShowRecharge(false)} 
-            />
-          </div>
+          <RechargeWorkflowPanel 
+            vcNumber={activeCustomer.vcNumber} 
+            smsId={activeCustomer.smsId} 
+            onClose={() => setShowRecharge(false)} 
+          />
         </div>
       )}
+
+      <RightIconBar />
     </div>
   );
 }

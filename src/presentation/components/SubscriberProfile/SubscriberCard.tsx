@@ -18,6 +18,7 @@ import {
   ExternalLink
 } from "lucide-react";
 import { cn } from "../../../lib/utils";
+import VIPStatusBadge from "./VIPStatusBadge";
 
 interface SubscriberCardProps {
   customer: Customer;
@@ -51,10 +52,13 @@ export default function SubscriberCard({ customer }: SubscriberCardProps) {
             )}
           </div>
           <div>
-            <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2 group">
-              {customer.name}
-              <ExternalLink size={12} className="text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" />
-            </h2>
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-bold text-slate-100 flex items-center gap-2 group">
+                {customer.name}
+                <ExternalLink size={12} className="text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" />
+              </h2>
+              <VIPStatusBadge vcNumber={customer.vcNumber} />
+            </div>
             <div className="flex items-center gap-2 mt-0.5">
               <span className={cn(
                 "text-[9px] font-black px-1.5 py-0.5 rounded tracking-tighter uppercase",
