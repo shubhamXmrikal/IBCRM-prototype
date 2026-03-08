@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { VIPStatus, VIPBenefit } from "../../../domain/loyalty/LoyaltyTypes";
+import { useAgentStore } from "../../../store/useAgentStore";
+import { cn } from "../../../lib/utils";
+import { Star, ShieldCheck, X, Crown, Zap, Gift, Trophy } from "lucide-react";
 
 interface VIPStatusBadgeProps {
   vcNumber: string;
@@ -12,6 +15,7 @@ export default function VIPStatusBadge({ vcNumber }: VIPStatusBadgeProps) {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
+  const { theme } = useAgentStore();
 
   useEffect(() => {
     fetchData();
@@ -45,69 +49,107 @@ export default function VIPStatusBadge({ vcNumber }: VIPStatusBadgeProps) {
   if (loading || !data.status) return null;
 
   const { status, benefits } = data;
+  const isDark = theme === 'dark';
 
   return (
     <>
-      <div 
+      <button 
         onClick={() => setShowModal(true)}
-        style={{
-          ...styles.badge,
-          backgroundColor: status.isVIP ? "#fef3c7" : "#f1f5f9",
-          color: status.isVIP ? "#92400e" : "#64748b",
-          cursor: "pointer"
-        }}
+        className={cn(
+          "px-2 py-1 rounded flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest transition-all hover:scale-105 active:scale-95",
+          status.isVIP 
+            ? "bg-amber-500/20 text-amber-500 border border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.1)]" 
+            : (isDark ? "bg-white/5 text-slate-500 border border-white/5" : "bg-slate-100 text-slate-500 border border-slate-200")
+        )}
       >
-        {status.isVIP ? "🌟 DishVIP Member" : "⚙️ Check VIP Eligibility"}
-      </div>
+        {status.isVIP ? <Star size={10} fill="currentColor" /> : <ShieldCheck size={10} />}
+        {status.isVIP ? "DishVIP Member" : "Check VIP Eligibility"}
+      </button>
 
       {showModal && (
-        <div style={styles.overlay}>
-          <div style={styles.modal}>
-            <div style={styles.header}>
-              <h3 style={{ margin: 0 }}>DishVIP Premium Program</h3>
-              <button onClick={() => setShowModal(false)} style={styles.closeBtn}>✕</button>
+        <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className={cn(
+            "w-full max-w-md rounded-3xl overflow-hidden shadow-2xl border transition-all duration-500",
+            isDark ? "bg-[#0B0F1A] border-white/10" : "bg-white border-slate-200"
+          )}>
+            {/* Modal Header */}
+            <div className={cn(
+              "px-6 py-4 border-b flex items-center justify-between",
+              isDark ? "bg-white/[0.02] border-white/5" : "bg-slate-50 border-slate-100"
+            )}>
+              <div className="flex items-center gap-2">
+                <Crown size={18} className="text-amber-500" />
+                <h3 className={cn(
+                  "text-xs font-black uppercase tracking-widest",
+                  isDark ? "text-slate-200" : "text-slate-800"
+                )}>
+                  DishVIP Premium Program
+                </h3>
+              </div>
+              <button 
+                onClick={() => setShowModal(false)}
+                className="p-2 rounded-xl hover:bg-white/5 text-slate-500 transition-colors"
+              >
+                <X size={20} />
+              </button>
             </div>
 
-            <div style={styles.content}>
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
               {status.isVIP ? (
-                <div style={styles.enrolledInfo}>
-                  <div style={{ fontSize: "40px", marginBottom: "12px" }}>🎖️</div>
-                  <h4 style={{ margin: 0 }}>Premium Member Since {new Date(status.enrolledOn!).toLocaleDateString()}</h4>
-                  <p style={{ fontSize: "13px", color: "#64748b" }}>This subscriber is part of our elite tier with full benefits active.</p>
+                <div className="text-center space-y-3 p-6 rounded-2xl bg-amber-500/10 border border-amber-500/20">
+                  <Trophy size={48} className="text-amber-500 mx-auto" />
+                  <div className="space-y-1">
+                    <h4 className={cn("text-sm font-bold uppercase", isDark ? "text-slate-100" : "text-slate-900")}>
+                      Premium Member Since {new Date(status.enrolledOn!).toLocaleDateString()}
+                    </h4>
+                    <p className="text-[11px] text-slate-500 font-medium">Full benefits active for this elite subscriber.</p>
+                  </div>
                 </div>
               ) : (
-                <div style={styles.prospectInfo}>
+                <div className="space-y-4">
                   {status.isEligible ? (
-                    <div style={styles.eligibleBox}>
-                      <strong>✅ Subscriber is Eligible!</strong>
-                      <div style={{ fontSize: "12px", marginTop: "4px" }}>{status.eligibilityReason}</div>
+                    <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1">
+                      <div className="flex items-center gap-2 text-emerald-500 font-black text-[11px] uppercase tracking-widest">
+                        <Star size={14} fill="currentColor" /> Subscriber is Eligible!
+                      </div>
+                      <p className="text-xs text-emerald-600/80 font-medium pl-6">{status.eligibilityReason}</p>
                     </div>
                   ) : (
-                    <div style={styles.ineligibleBox}>
-                      <strong>❌ Not Eligible for VIP</strong>
-                      <div style={{ fontSize: "12px", marginTop: "4px" }}>{status.eligibilityReason}</div>
+                    <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 space-y-1">
+                      <div className="flex items-center gap-2 text-rose-500 font-black text-[11px] uppercase tracking-widest">
+                        <X size={14} /> Not Eligible for VIP
+                      </div>
+                      <p className="text-xs text-rose-600/80 font-medium pl-6">{status.eligibilityReason}</p>
                     </div>
                   )}
                 </div>
               )}
 
-              <div style={styles.benefitsGrid}>
-                {benefits.map(b => (
-                  <div key={b.id} style={styles.benefitItem}>
-                    <span style={{ fontSize: "20px" }}>{b.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: 700, fontSize: "13px" }}>{b.name}</div>
-                      <div style={{ fontSize: "11px", color: "#64748b" }}>{b.description}</div>
+              {/* Benefits Grid */}
+              <div className="space-y-3">
+                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest px-1">Active Privileges</div>
+                <div className="grid grid-cols-1 gap-2">
+                  {benefits.map(b => (
+                    <div key={b.id} className={cn(
+                      "p-3 rounded-xl border flex items-center gap-3 transition-all",
+                      isDark ? "bg-white/[0.02] border-white/5" : "bg-slate-50 border-slate-100"
+                    )}>
+                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-lg">{b.icon}</div>
+                      <div>
+                        <div className={cn("text-[11px] font-bold", isDark ? "text-slate-200" : "text-slate-800")}>{b.name}</div>
+                        <div className="text-[10px] text-slate-500 font-medium">{b.description}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
               {!status.isVIP && status.isEligible && (
                 <button 
                   onClick={handleEnroll} 
                   disabled={enrolling}
-                  style={styles.enrollBtn}
+                  className="w-full py-4 rounded-2xl bg-amber-600 text-white text-sm font-black uppercase tracking-tighter shadow-xl shadow-amber-900/20 hover:bg-amber-500 active:scale-95 transition-all disabled:opacity-50"
                 >
                   {enrolling ? "Enrolling..." : "Enroll in DishVIP Now 🚀"}
                 </button>
@@ -119,18 +161,3 @@ export default function VIPStatusBadge({ vcNumber }: VIPStatusBadgeProps) {
     </>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  badge: { padding: "4px 10px", borderRadius: "4px", fontSize: "11px", fontWeight: 700, display: "inline-block" },
-  overlay: { position: "fixed", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0,0,0,0.6)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 6000 },
-  modal: { background: "white", width: "450px", borderRadius: "12px", overflow: "hidden", boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)" },
-  header: { padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", background: "#f8fafc" },
-  closeBtn: { background: "none", border: "none", fontSize: "18px", cursor: "pointer", color: "#64748b" },
-  content: { padding: "24px", display: "flex", flexDirection: "column", gap: "20px" },
-  enrolledInfo: { textAlign: "center", padding: "20px", background: "#fffbeb", borderRadius: "8px", border: "1px solid #fef3c7" },
-  eligibleBox: { padding: "12px", background: "#ecfdf5", border: "1px solid #a7f3d0", borderRadius: "6px", color: "#065f46" },
-  ineligibleBox: { padding: "12px", background: "#fef2f2", border: "1px solid #fee2e2", borderRadius: "6px", color: "#991b1b" },
-  benefitsGrid: { display: "flex", flexDirection: "column", gap: "12px" },
-  benefitItem: { display: "flex", gap: "12px", alignItems: "center" },
-  enrollBtn: { padding: "12px", background: "#d97706", color: "white", border: "none", borderRadius: "6px", fontWeight: 700, cursor: "pointer" }
-};

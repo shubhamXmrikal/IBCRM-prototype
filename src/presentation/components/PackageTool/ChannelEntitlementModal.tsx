@@ -2,6 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { ChannelDetail } from "../../../domain/package/FinancialTypes";
+import { useAgentStore } from "../../../store/useAgentStore";
+import { cn } from "../../../lib/utils";
+import { Search, X, Monitor, Shield, Satellite } from "lucide-react";
 
 interface ChannelEntitlementModalProps {
   onClose: () => void;
@@ -11,6 +14,7 @@ export default function ChannelEntitlementModal({ onClose }: ChannelEntitlementM
   const [channels, setChannels] = useState<ChannelDetail[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
+  const { theme } = useAgentStore();
 
   useEffect(() => {
     fetchChannels();
@@ -18,12 +22,17 @@ export default function ChannelEntitlementModal({ onClose }: ChannelEntitlementM
 
   const fetchChannels = async () => {
     setLoading(true);
-    const res = await fetch("/api/master/channels");
-    if (res.ok) {
-      const data = await res.json();
-      setChannels(data);
+    try {
+      const res = await fetch("/api/master/channels");
+      if (res.ok) {
+        const data = await res.json();
+        setChannels(data);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   const filteredChannels = channels.filter(c => 
@@ -33,57 +42,110 @@ export default function ChannelEntitlementModal({ onClose }: ChannelEntitlementM
   );
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
-        <div style={styles.header}>
-          <h3 style={{ margin: 0 }}>Entitled Channel List</h3>
-          <button onClick={onClose} style={styles.closeBtn}>✕</button>
+    <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in">
+      <div className={cn(
+        "w-full max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden flex flex-col shadow-2xl border transition-all duration-500",
+        theme === 'dark' ? "bg-[#0B0F1A] border-white/10" : "bg-white border-slate-200"
+      )}>
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-white/5 flex items-center justify-between">
+          <div>
+            <h3 className={cn(
+              "text-sm font-black uppercase tracking-widest",
+              theme === 'dark' ? "text-slate-200" : "text-slate-800"
+            )}>
+              Entitled Channel List
+            </h3>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+              Authorized Content for Subscriber
+            </p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 rounded-xl hover:bg-white/5 text-slate-500 hover:text-orange-500 transition-all"
+          >
+            <X size={20} />
+          </button>
         </div>
 
-        <div style={styles.searchBar}>
+        {/* Search */}
+        <div className={cn(
+          "px-6 py-4 border-b border-white/5 flex items-center gap-3",
+          theme === 'dark' ? "bg-white/[0.02]" : "bg-slate-50"
+        )}>
+          <Search size={16} className="text-slate-500" />
           <input 
             type="text" 
             placeholder="Search by name, code, or category..." 
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={styles.input}
+            className="bg-transparent border-none outline-none text-xs w-full placeholder:text-slate-600 font-medium"
             autoFocus
           />
         </div>
 
-        <div style={styles.listWrapper}>
+        {/* Table Content */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-6 py-2">
           {loading ? (
-            <div style={{ textAlign: "center", padding: "40px" }}>Loading channels...</div>
+            <div className="flex flex-col items-center justify-center py-20 animate-pulse">
+              <Monitor size={32} className="text-slate-700 mb-4" />
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Fetching Entitlements...</p>
+            </div>
           ) : (
-            <table style={styles.table}>
-              <thead>
-                <tr style={styles.thRow}>
-                  <th style={styles.th}>Code</th>
-                  <th style={styles.th}>Channel Name</th>
-                  <th style={styles.th}>Category</th>
-                  <th style={styles.th}>Type</th>
-                  <th style={styles.th}>Security</th>
+            <table className="w-full text-left border-collapse">
+              <thead className="sticky top-0 z-10">
+                <tr className={cn(
+                  "text-[10px] font-black uppercase tracking-widest border-b border-white/5",
+                  theme === 'dark' ? "bg-[#0B0F1A] text-slate-500" : "bg-white text-slate-400"
+                )}>
+                  <th className="py-3 px-2">Code</th>
+                  <th className="py-3 px-2">Channel Name</th>
+                  <th className="py-3 px-2">Category</th>
+                  <th className="py-3 px-2">Type</th>
+                  <th className="py-3 px-2">Security</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-white/5">
                 {filteredChannels.length === 0 ? (
-                  <tr><td colSpan={5} style={{ textAlign: "center", padding: "20px" }}>No channels match your search.</td></tr>
+                  <tr>
+                    <td colSpan={5} className="py-20 text-center text-xs font-bold text-slate-600 uppercase tracking-widest">
+                      No matching channels found
+                    </td>
+                  </tr>
                 ) : (
                   filteredChannels.map((c) => (
-                    <tr key={c.code} style={styles.tr}>
-                      <td style={styles.td}>{c.code}</td>
-                      <td style={styles.td}>
-                        <div style={{ fontWeight: 600 }}>{c.name}</div>
-                        {c.requiresThreeSatellite && <div style={{ fontSize: "10px", color: "#ea580c" }}>Requires 3-Satellite</div>}
+                    <tr key={c.code} className="group hover:bg-white/[0.02] transition-colors">
+                      <td className="py-4 px-2 font-mono text-[11px] text-slate-500">{c.code}</td>
+                      <td className="py-4 px-2">
+                        <div className={cn(
+                          "text-xs font-bold",
+                          theme === 'dark' ? "text-slate-200" : "text-slate-800"
+                        )}>
+                          {c.name}
+                        </div>
+                        {c.requiresThreeSatellite && (
+                          <div className="flex items-center gap-1 text-[9px] font-bold text-orange-500 uppercase tracking-tighter mt-0.5">
+                            <Satellite size={10} /> 3-SATELLITE REQ
+                          </div>
+                        )}
                       </td>
-                      <td style={styles.td}>{c.category}</td>
-                      <td style={styles.td}>
-                        <span style={{ ...styles.badge, background: c.isHD ? "#dcfce7" : "#f1f5f9", color: c.isHD ? "#166534" : "#475569" }}>
+                      <td className="py-4 px-2 text-[11px] font-medium text-slate-500">{c.category}</td>
+                      <td className="py-4 px-2">
+                        <span className={cn(
+                          "px-1.5 py-0.5 rounded text-[10px] font-black tracking-tighter",
+                          c.isHD 
+                            ? "bg-orange-500/10 text-orange-500" 
+                            : "bg-slate-500/10 text-slate-500"
+                        )}>
                           {c.isHD ? "HD" : "SD"}
                         </span>
                       </td>
-                      <td style={styles.td}>
-                        {c.isHighSecurity ? <span title="High Security Encryption">🔒</span> : "-"}
+                      <td className="py-4 px-2">
+                        {c.isHighSecurity && (
+                          <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center" title="High Security Encryption">
+                            <Shield size={12} className="text-emerald-500" />
+                          </div>
+                        )}
                       </td>
                     </tr>
                   ))
@@ -93,104 +155,15 @@ export default function ChannelEntitlementModal({ onClose }: ChannelEntitlementM
           )}
         </div>
         
-        <div style={styles.footer}>
-          Total Entitled: <strong>{channels.length}</strong> | Showing: <strong>{filteredChannels.length}</strong>
+        {/* Footer */}
+        <div className={cn(
+          "px-6 py-3 border-t border-white/5 flex items-center justify-between text-[10px] font-bold uppercase tracking-widest",
+          theme === 'dark' ? "bg-white/[0.01] text-slate-600" : "bg-slate-50 text-slate-400"
+        )}>
+          <div>Total Entitled: <span className="text-orange-500">{channels.length}</span></div>
+          <div>Showing: <span className="text-orange-500">{filteredChannels.length}</span></div>
         </div>
       </div>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    background: "rgba(0,0,0,0.5)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 1000,
-  },
-  modal: {
-    background: "white",
-    width: "90%",
-    maxWidth: "800px",
-    maxHeight: "80vh",
-    borderRadius: "12px",
-    display: "flex",
-    flexDirection: "column",
-    overflow: "hidden",
-    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-  },
-  header: {
-    padding: "16px 20px",
-    borderBottom: "1px solid #e2e8f0",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  closeBtn: {
-    background: "none",
-    border: "none",
-    fontSize: "20px",
-    cursor: "pointer",
-    color: "#64748b",
-  },
-  searchBar: {
-    padding: "16px 20px",
-    background: "#f8fafc",
-    borderBottom: "1px solid #e2e8f0",
-  },
-  input: {
-    width: "100%",
-    padding: "10px 14px",
-    borderRadius: "6px",
-    border: "1px solid #cbd5e1",
-    fontSize: "14px",
-  },
-  listWrapper: {
-    flex: 1,
-    overflowY: "auto",
-    padding: "0 20px",
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    fontSize: "13px",
-  },
-  thRow: {
-    position: "sticky",
-    top: 0,
-    background: "white",
-    textAlign: "left",
-    zIndex: 1,
-  },
-  th: {
-    padding: "12px 8px",
-    fontWeight: 600,
-    color: "#64748b",
-    borderBottom: "2px solid #f1f5f9",
-  },
-  tr: {
-    borderBottom: "1px solid #f1f5f9",
-  },
-  td: {
-    padding: "12px 8px",
-  },
-  badge: {
-    padding: "2px 6px",
-    borderRadius: "4px",
-    fontSize: "11px",
-    fontWeight: 600,
-  },
-  footer: {
-    padding: "12px 20px",
-    background: "#f8fafc",
-    borderTop: "1px solid #e2e8f0",
-    fontSize: "12px",
-    color: "#64748b",
-  }
-};

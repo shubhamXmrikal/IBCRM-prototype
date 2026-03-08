@@ -25,3 +25,12 @@ export interface OutboundCampaignEntry {
   agentName: string;
   feedback: string;
 }
+
+export interface ComplaintEntry {
+  id: string;
+  status: 'OPEN' | 'RESOLVED' | 'CLOSED' | string;
+  subject: string;
+  description: string;
+  createdOn: string | Date;
+  createdBy: string;
+}

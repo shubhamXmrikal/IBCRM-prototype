@@ -1,6 +1,13 @@
 "use client";
 
 import React from "react";
+import { useAgentStore } from "../../../store/useAgentStore";
+import { cn } from "../../../lib/utils";
+import QuickActionsContainer from "../../quick-actions/QuickActionsContainer";
+import WatchoActionsContainer from "../../watcho/WatchoActionsContainer";
+import TroubleshootingSidebar from "../../troubleshooting/TroubleshootingSidebar";
+import DiagnosticContainer from "../../troubleshooting/DiagnosticContainer";
+import { TroubleshootingCategory } from "../../../domain/troubleshooting/types";
 
 type IconKey =
   | "Agent Profile"
@@ -212,27 +219,27 @@ const ICONS: IconButtonConfig[] = [
   {
     key: "Agent Profile",
     tooltip: "Agent Profile",
-    renderIcon: (active) => <UserIcon color={active ? "#ffffff" : "#0f172a"} />,
+    renderIcon: (active) => <UserIcon color={active ? "#ffffff" : "#64748b"} />,
   },
   {
     key: "Camera / CCTV",
     tooltip: "Camera / CCTV",
     renderIcon: (active) => (
-      <CameraIcon color={active ? "#ffffff" : "#0f172a"} />
+      <CameraIcon color={active ? "#ffffff" : "#64748b"} />
     ),
   },
   {
     key: "View Profile",
     tooltip: "View Profile",
     renderIcon: (active) => (
-      <ContactIcon color={active ? "#ffffff" : "#0f172a"} />
+      <ContactIcon color={active ? "#ffffff" : "#64748b"} />
     ),
   },
   {
     key: "Person",
     tooltip: "Person",
     renderIcon: (active) => (
-      <UserCircleIcon color={active ? "#ffffff" : "#0f172a"} />
+      <UserCircleIcon color={active ? "#ffffff" : "#64748b"} />
     ),
   },
   {
@@ -243,13 +250,13 @@ const ICONS: IconButtonConfig[] = [
   {
     key: "Grid",
     tooltip: "Grid",
-    renderIcon: (active) => <GridIcon color={active ? "#ffffff" : "#0f172a"} />,
+    renderIcon: (active) => <GridIcon color={active ? "#ffffff" : "#64748b"} />,
   },
   {
     key: "Status Dots",
     tooltip: "Status Dots",
     renderIcon: (active) => (
-      <MoreHorizontalIcon color={active ? "#ffffff" : "#0f172a"} />
+      <MoreHorizontalIcon color={active ? "#ffffff" : "#64748b"} />
     ),
   },
   {
@@ -261,7 +268,7 @@ const ICONS: IconButtonConfig[] = [
     key: "Troubleshooting",
     tooltip: "Troubleshooting",
     renderIcon: (active) => (
-      <WrenchIcon color={active ? "#ffffff" : "#0f172a"} />
+      <WrenchIcon color={active ? "#ffffff" : "#64748b"} />
     ),
   },
   {
@@ -273,50 +280,28 @@ const ICONS: IconButtonConfig[] = [
 ];
 
 export default function RightIconBar() {
+  const { theme } = useAgentStore();
   const [activeKey, setActiveKey] = React.useState<IconKey>("Agent Profile");
   const [hoveredKey, setHoveredKey] = React.useState<IconKey | null>(null);
 
   const handleClick = (config: IconButtonConfig) => {
-    // eslint-disable-next-line no-console
-    console.log(config.key);
     if (!config.disableActiveState) {
       setActiveKey(config.key);
     }
   };
 
+  const isDark = theme === "dark";
+
   return (
     <div
-      style={{
-        position: "fixed",
-        top: 0,
-        right: 0,
-        width: 44,
-        height: "100vh",
-        backgroundColor: "#f5f5f5",
-        borderLeft: "1px solid #e5e7eb",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "stretch",
-        zIndex: 40,
-      }}
+      className={cn(
+        "h-full flex flex-col items-stretch z-40 transition-colors duration-500",
+        "bg-background border-l border-border"
+      )}
     >
       {ICONS.map((config) => {
         const isActive = !config.disableActiveState && activeKey === config.key;
-        const baseBg = isActive ? "#f97316" : "#ffffff";
-        const buttonStyle: React.CSSProperties = {
-          width: 44,
-          height: 44,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: baseBg,
-          border: "none",
-          borderBottom: "1px solid #e5e7eb",
-          cursor: "pointer",
-          padding: 0,
-          position: "relative",
-        };
-
+        
         const showProfilePanel =
           hoveredKey === "Agent Profile" && config.key === "Agent Profile";
         const showGridPanel = hoveredKey === "Grid" && config.key === "Grid";
@@ -330,7 +315,7 @@ export default function RightIconBar() {
         return (
           <div
             key={config.key}
-            style={{ position: "relative" }}
+            className="relative"
             onMouseEnter={() => setHoveredKey(config.key)}
             onMouseLeave={() =>
               setHoveredKey((prev) => (prev === config.key ? null : prev))
@@ -338,21 +323,24 @@ export default function RightIconBar() {
           >
             <button
               type="button"
-              style={buttonStyle}
+              className={cn(
+                "w-[44px] h-[44px] flex items-center justify-center border-none border-b cursor-pointer p-0 relative transition-all",
+                isActive ? "bg-orange-500 border-orange-600" : "bg-transparent border-border hover:bg-muted"
+              )}
               onClick={() => handleClick(config)}
             >
               {config.renderIcon(isActive)}
             </button>
 
-            {showProfilePanel && <ProfileFlyout />}
+            {showProfilePanel && <ProfileFlyout theme={theme} />}
 
-            {showGridPanel && <QuickActionsFlyout />}
+            {showGridPanel && <QuickActionsFlyout theme={theme} />}
 
-            {showWatchoPanel && <WatchoFlyout />}
+            {showWatchoPanel && <WatchoFlyout theme={theme} />}
 
-            {showCameraPanel && <CameraFlyout />}
+            {showCameraPanel && <CameraFlyout theme={theme} />}
 
-            {showTroublePanel && <TroubleshootingFlyout />}
+            {showTroublePanel && <TroubleshootingFlyout theme={theme} />}
 
             {hoveredKey === config.key &&
               !showProfilePanel &&
@@ -361,20 +349,10 @@ export default function RightIconBar() {
               !showCameraPanel &&
               !showTroublePanel && (
                 <div
-                  style={{
-                    position: "absolute",
-                    right: 40,
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    backgroundColor: "#0f172a",
-                    color: "#f9fafb",
-                    padding: "4px 8px",
-                    borderRadius: 4,
-                    fontSize: 11,
-                    whiteSpace: "nowrap",
-                    boxShadow:
-                      "0 10px 15px -3px rgba(15,23,42,0.3), 0 4px 6px -4px rgba(15,23,42,0.25)",
-                  }}
+                  className={cn(
+                    "absolute right-12 top-1/2 -translate-y-1/2 px-2 py-1 rounded text-[10px] font-bold uppercase tracking-widest whitespace-nowrap shadow-2xl z-50",
+                    "bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-200"
+                  )}
                 >
                   {config.tooltip}
                 </div>
@@ -391,71 +369,59 @@ function FlyoutCard({
   children,
   width = 360,
   headerColor = "#f97316",
+  theme = "light",
 }: {
   title: string;
   children: React.ReactNode;
   width?: number;
   headerColor?: string;
+  theme?: string;
 }) {
   return (
     <div
-      style={{
-        position: "absolute",
-        right: 40,
-        top: 4,
-        width,
-        backgroundColor: "#ffffff",
-        borderRadius: 6,
-        border: "1px solid #e5e7eb",
-        boxShadow:
-          "0 20px 25px -5px rgba(15,23,42,0.25), 0 10px 10px -5px rgba(15,23,42,0.2)",
-        overflow: "hidden",
-        zIndex: 50,
-      }}
+      className={cn(
+        "absolute right-12 top-1 rounded-2xl overflow-hidden shadow-2xl border z-50 transition-all duration-300 animate-in fade-in slide-in-from-right-4",
+        "bg-card border-border"
+      )}
+      style={{ width }}
     >
       <div
         style={{
           backgroundColor: headerColor,
           color: "#ffffff",
-          padding: "6px 10px",
-          fontSize: 12,
-          fontWeight: 600,
+          padding: "10px 16px",
+          fontSize: "11px",
+          fontWeight: 900,
+          textTransform: "uppercase",
+          letterSpacing: "0.1em",
         }}
       >
         {title}
       </div>
       <div
-        style={{
-          backgroundColor: "#fff7ed",
-          padding: "8px 10px",
-          borderBottom: "1px solid #fed7aa",
-          fontSize: 11,
-          color: "#7c2d12",
-        }}
+        className={cn(
+          "px-4 py-2 text-[10px] font-bold uppercase tracking-tighter border-b",
+          "bg-muted/50 border-border text-muted-foreground"
+        )}
       >
         Prototype panel – actions are placeholders.
       </div>
-      <div
-        style={{
-          padding: "8px 10px",
-          backgroundColor: "#ffffff",
-        }}
-      >
+      <div className="p-4">
         {children}
       </div>
     </div>
   );
 }
 
-function CameraFlyout() {
+function CameraFlyout({ theme }: { theme: string }) {
   const [status, setStatus] = React.useState<"pending" | "success" | "error">(
     "pending",
   );
 
   const statusColors = {
-    pending: "#f59e0b", // --color-warning
-    success: "#22c55e", // --color-success
-    error: "#ef4444", // --color-critical
+    pending: "#f59e0b",
+    success: "#22c55e",
+    error: "#ef4444",
   };
 
   const statusLabels = {
@@ -465,22 +431,13 @@ function CameraFlyout() {
   };
 
   return (
-    <FlyoutCard title="Face Matching / CCTV" headerColor="#64748b">
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {/* Mock Camera Feed */}
+    <FlyoutCard title="Face Matching / CCTV" headerColor="#64748b" theme={theme}>
+      <div className="flex flex-col gap-4">
         <div
-          style={{
-            width: "100%",
-            height: 180,
-            backgroundColor: "#0f172a",
-            borderRadius: 4,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexDirection: "column",
-            position: "relative",
-            overflow: "hidden",
-          }}
+          className={cn(
+            "w-full h-[180px] rounded-xl flex items-center justify-center flex-col relative overflow-hidden",
+            "bg-slate-950"
+          )}
         >
           <div
             style={{
@@ -493,13 +450,7 @@ function CameraFlyout() {
             }}
           >
             <div
-              style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                backgroundColor: "#ef4444",
-                animation: "pulse 1.5s infinite",
-              }}
+              className="w-2 h-2 rounded-full bg-red-500 animate-pulse"
             />
             <span style={{ color: "#ffffff", fontSize: 10, fontWeight: 600 }}>
               LIVE
@@ -517,43 +468,23 @@ function CameraFlyout() {
             AGENT CAMERA FEED
           </span>
 
-          {/* Scanning Overlay */}
           {status === "pending" && (
             <div
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                height: 2,
-                backgroundColor: "#3b82f6",
-                boxShadow: "0 0 10px #3b82f6",
-                animation: "scan 3s ease-in-out infinite",
-              }}
+              className="absolute top-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_0_10px_#3b82f6] animate-scan"
             />
           )}
         </div>
 
-        {/* Status Badge */}
         <div
+          className="flex items-center justify-center p-2 rounded-lg border gap-2"
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "6px",
             backgroundColor: `${statusColors[status]}15`,
-            border: `1px solid ${statusColors[status]}`,
-            borderRadius: 4,
-            gap: 8,
+            borderColor: statusColors[status],
           }}
         >
           <div
-            style={{
-              width: 8,
-              height: 8,
-              borderRadius: "50%",
-              backgroundColor: statusColors[status],
-            }}
+            className="w-2 h-2 rounded-full"
+            style={{ backgroundColor: statusColors[status] }}
           />
           <span
             style={{
@@ -566,179 +497,96 @@ function CameraFlyout() {
           </span>
         </div>
 
-        {/* Agent Info */}
         <div
-          style={{
-            fontSize: 11,
-            color: "#64748b",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 4,
-          }}
+          className={cn(
+            "text-[10px] font-bold uppercase grid grid-cols-2 gap-2 text-muted-foreground"
+          )}
         >
-          <div>
-            <strong>Agent:</strong> test0407
-          </div>
-          <div>
-            <strong>Mode:</strong> WFH
-          </div>
-          <div>
-            <strong>Match Score:</strong>{" "}
-            {status === "success" ? "98.4%" : "--"}
-          </div>
-          <div>
-            <strong>Last Check:</strong> 11:32:24
-          </div>
+          <div><strong>Agent:</strong> test0407</div>
+          <div><strong>Mode:</strong> WFH</div>
+          <div><strong>Match Score:</strong> {status === "success" ? "98.4%" : "--"}</div>
+          <div><strong>Last Check:</strong> 11:32:24</div>
         </div>
 
-        {/* Actions */}
-        <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+        <div className="flex gap-2 mt-2">
           <button
             type="button"
             onClick={() => setStatus("success")}
-            style={{
-              flex: 1,
-              padding: "8px",
-              backgroundColor: "#ffffff",
-              border: "1px solid #e2e8f0",
-              borderRadius: 4,
-              fontSize: 12,
-              cursor: "pointer",
-              fontWeight: 500,
-            }}
+            className={cn(
+              "flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+              "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            )}
           >
             Verify
           </button>
           <button
             type="button"
             onClick={() => setStatus("error")}
-            style={{
-              flex: 1,
-              padding: "8px",
-              backgroundColor: "#ffffff",
-              border: "1px solid #e2e8f0",
-              borderRadius: 4,
-              fontSize: 12,
-              cursor: "pointer",
-              fontWeight: 500,
-            }}
+            className={cn(
+              "flex-1 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+              "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+            )}
           >
             Reset
           </button>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes scan {
-          0% {
-            top: 0;
-          }
-          50% {
-            top: 100%;
-          }
-          100% {
-            top: 0;
-          }
-        }
-        @keyframes pulse {
-          0% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.4;
-          }
-          100% {
-            opacity: 1;
-          }
-        }
-      `}</style>
     </FlyoutCard>
   );
 }
 
-function ProfileFlyout() {
+function ProfileFlyout({ theme }: { theme: string }) {
   return (
-    <FlyoutCard title="User Information">
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "120px 1fr",
-          rowGap: 4,
-          columnGap: 8,
-          fontSize: 12,
-        }}
-      >
-        <div style={{ fontWeight: 600 }}>Logged Date</div>
-        <div>03/Mar/2026 11:32:24</div>
-        <div style={{ fontWeight: 600 }}>User Name</div>
-        <div>test0407</div>
-        <div style={{ fontWeight: 600 }}>User ID</div>
-        <div>123456</div>
-        <div style={{ fontWeight: 600 }}>ZT User ID</div>
-        <div>44441</div>
-        <div style={{ fontWeight: 600 }}>Center ID</div>
-        <div>Noida (2)</div>
-      </div>
+    <FlyoutCard title="User Information" theme={theme}>
+      <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-2 text-[11px]">
+          <div className="font-bold text-muted-foreground uppercase tracking-tighter">Logged Date</div>
+          <div className="text-foreground">03/Mar/2026 11:32:24</div>
+          <div className="font-bold text-muted-foreground uppercase tracking-tighter">User Name</div>
+          <div className="text-foreground">test0407</div>
+          <div className="font-bold text-muted-foreground uppercase tracking-tighter">User ID</div>
+          <div className="text-foreground">123456</div>
+          <div className="font-bold text-muted-foreground uppercase tracking-tighter">ZT User ID</div>
+          <div className="text-foreground">44441</div>
+          <div className="font-bold text-muted-foreground uppercase tracking-tighter">Center ID</div>
+          <div className="text-foreground">Noida (2)</div>
+        </div>
 
-      <div
-        style={{
-          marginTop: 10,
-          display: "flex",
-          justifyContent: "flex-end",
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            // eslint-disable-next-line no-console
-            console.log("Sign Out");
-          }}
-          style={{
-            padding: "6px 14px",
-            backgroundColor: "#f97316",
-            borderRadius: 999,
-            color: "#ffffff",
-            fontSize: 12,
-            border: "none",
-            cursor: "pointer",
-          }}
-        >
-          Sign Out
-        </button>
+        <div className="flex justify-end pt-2 border-t border-border">
+          <button
+            type="button"
+            onClick={() => console.log("Sign Out")}
+            className="px-4 py-2 bg-orange-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 transition-all shadow-lg shadow-orange-900/20"
+          >
+            Sign Out
+          </button>
+        </div>
       </div>
     </FlyoutCard>
   );
 }
 
-import QuickActionsContainer from "../../presentation/quick-actions/QuickActionsContainer";
-
-function QuickActionsFlyout() {
+function QuickActionsFlyout({ theme }: { theme: string }) {
   return (
-    <FlyoutCard title="Agent Shortcuts" width={800} headerColor="#f97316">
-      <div style={{ height: 500, margin: "-8px -10px" }}>
+    <FlyoutCard title="Agent Shortcuts" width={800} headerColor="#f97316" theme={theme}>
+      <div className="h-[500px] -m-4 overflow-hidden rounded-b-2xl">
         <QuickActionsContainer />
       </div>
     </FlyoutCard>
   );
 }
 
-import WatchoActionsContainer from "../../presentation/watcho/WatchoActionsContainer";
-
-function WatchoFlyout() {
+function WatchoFlyout({ theme }: { theme: string }) {
   return (
-    <FlyoutCard title="Watcho Actions" width={800} headerColor="#7c3aed">
-      <div style={{ height: 500, margin: "-8px -10px" }}>
+    <FlyoutCard title="Watcho Actions" width={800} headerColor="#7c3aed" theme={theme}>
+      <div className="h-[500px] -m-4 overflow-hidden rounded-b-2xl">
         <WatchoActionsContainer />
       </div>
     </FlyoutCard>
   );
 }
 
-import TroubleshootingSidebar from "../../presentation/troubleshooting/TroubleshootingSidebar";
-import DiagnosticContainer from "../../presentation/troubleshooting/DiagnosticContainer";
-import { TroubleshootingCategory } from "../../domain/troubleshooting/types";
-
-function TroubleshootingFlyout() {
+function TroubleshootingFlyout({ theme }: { theme: string }) {
   const [selectedCategory, setSelectedCategory] =
     React.useState<TroubleshootingCategory | null>(null);
 
@@ -752,13 +600,16 @@ function TroubleshootingFlyout() {
       title="Technical Troubleshooting"
       width={800}
       headerColor="#3b82f6"
+      theme={theme}
     >
-      <div style={{ display: "flex", height: 500, margin: "-8px -10px" }}>
+      <div className="flex h-[500px] -m-4 overflow-hidden rounded-b-2xl">
         <TroubleshootingSidebar
           onSelectCategory={setSelectedCategory}
           selectedCategoryId={selectedCategory?.id}
         />
-        <div style={{ flex: 1, backgroundColor: "#ffffff" }}>
+        <div className={cn(
+          "flex-1 transition-colors duration-500 bg-background"
+        )}>
           {selectedCategory ? (
             <DiagnosticContainer
               key={selectedCategory.id}
@@ -766,27 +617,20 @@ function TroubleshootingFlyout() {
               onComplete={handleComplete}
             />
           ) : (
-            <div
-              style={{
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-                color: "#94a3b8",
-                padding: "40px",
-                textAlign: "center",
-              }}
-            >
-              <WrenchIcon color="#e2e8f0" />
-              <div
-                style={{ fontSize: "16px", fontWeight: 600, marginTop: "12px" }}
-              >
-                Select a category to start troubleshooting
+            <div className="h-full flex flex-col items-center justify-center p-10 text-center space-y-4">
+              <div className={cn(
+                "w-16 h-16 rounded-2xl flex items-center justify-center border bg-muted border-border"
+              )}>
+                <WrenchIcon color="#64748b" />
               </div>
-              <p style={{ fontSize: "13px", marginTop: "8px" }}>
-                Probing the subscriber's issue using guided diagnostic steps.
-              </p>
+              <div>
+                <div className="text-lg font-bold text-foreground">
+                  Guided Diagnostics
+                </div>
+                <p className="text-xs text-muted-foreground max-w-[240px] mt-1">
+                  Select a category from the sidebar to begin step-by-step resolution.
+                </p>
+              </div>
             </div>
           )}
         </div>

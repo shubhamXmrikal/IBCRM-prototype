@@ -74,20 +74,17 @@ export default function AgentGlobalToolbar() {
 
 const styles: Record<string, React.CSSProperties> = {
   toolbar: {
-    position: "fixed",
-    bottom: "40px", // Stack above BottomToolbar
-    left: 0,
-    right: "44px", // Avoid RightIconBar
-    height: "36px",
-    background: "#0f172a", // Slightly darker
+    width: "100%",
+    height: "32px",
+    background: "#0f172a", // Darker navy
     color: "white",
     display: "flex",
     alignItems: "center",
     padding: "0 20px",
-    borderTop: "1px solid rgba(255,255,255,0.1)",
+    borderBottom: "1px solid rgba(255,255,255,0.1)",
     fontSize: "11px",
-    zIndex: 1000,
-    boxShadow: "0 -2px 10px rgba(0,0,0,0.1)"
+    zIndex: 100,
+    boxShadow: "0 2px 10px rgba(0,0,0,0.2)"
   },
   section: { display: "flex", alignItems: "center", gap: "10px" },
   icon: { fontSize: "16px", opacity: 0.8 },

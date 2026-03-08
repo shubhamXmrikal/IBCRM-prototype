@@ -2,6 +2,9 @@
 
 import React from "react";
 import { SearchSubsDetails } from "../../../domain/customer/SubscriberSearchTypes";
+import { useAgentStore } from "../../../store/useAgentStore";
+import { cn } from "../../../lib/utils";
+import { Users, X, MapPin, Hash, Info, ChevronRight } from "lucide-react";
 
 interface DisambiguationModalProps {
   candidates: SearchSubsDetails[];
@@ -10,211 +13,124 @@ interface DisambiguationModalProps {
   onClose: () => void;
 }
 
-/**
- * DisambiguationModal
- *
- * Shown when a MOBILE or EMAIL search returns multiple matching accounts.
- * Maps to the legacy "pick from list" flow where the agent selects one before
- * the full subscriber screen loads.
- *
- * Legacy equivalent: getSubDetailsBySearchText() → agent picks → getSubscriberInfoDetails()
- */
 export default function DisambiguationModal({
   candidates,
   searchValue,
   onSelect,
   onClose,
 }: DisambiguationModalProps) {
+  const { theme } = useAgentStore();
+  const isDark = theme === 'dark';
+
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
+    <div className="fixed inset-0 z-[500] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className={cn(
+        "w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl border transition-all duration-500 flex flex-col max-h-[85vh]",
+        isDark ? "bg-[#0B0F1A] border-white/10" : "bg-white border-slate-200"
+      )}>
         {/* Header */}
-        <div style={styles.header}>
-          <div>
-            <h3 style={styles.title}>Multiple Accounts Found</h3>
-            <p style={styles.subtitle}>
-              The mobile/email <strong>{searchValue}</strong> is linked to{" "}
-              {candidates.length} accounts. Select one to proceed.
-            </p>
+        <div className={cn(
+          "px-6 py-5 border-b flex items-center justify-between",
+          isDark ? "bg-white/[0.02] border-white/5" : "bg-slate-50 border-slate-100"
+        )}>
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-blue-600/10 flex items-center justify-center border border-blue-500/20">
+              <Users size={24} className="text-blue-500" />
+            </div>
+            <div>
+              <h3 className={cn(
+                "text-base font-black uppercase tracking-widest",
+                isDark ? "text-slate-200" : "text-slate-800"
+              )}>
+                Multiple Accounts Found
+              </h3>
+              <p className="text-[11px] font-medium text-slate-500 mt-0.5">
+                The identifier <span className="text-orange-500 font-bold">{searchValue}</span> is linked to {candidates.length} records.
+              </p>
+            </div>
           </div>
-          <button onClick={onClose} style={styles.closeBtn} title="Close">
-            ✕
+          <button 
+            onClick={onClose}
+            className="p-2 rounded-xl hover:bg-white/5 text-slate-500 hover:text-rose-500 transition-all"
+          >
+            <X size={24} />
           </button>
         </div>
 
         {/* Candidate list */}
-        <div style={styles.list}>
+        <div className="flex-1 overflow-y-auto p-6 space-y-3 scrollbar-hide">
           {candidates.map((c) => (
-            <div
+            <button
               key={c.vcNumber}
-              style={styles.row}
               onClick={() => onSelect(c.vcNumber)}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background =
-                  "#1e293b";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.background =
-                  "#0f172a";
-              }}
+              className={cn(
+                "w-full text-left p-4 rounded-2xl border transition-all group flex items-center justify-between",
+                isDark 
+                  ? "bg-white/[0.03] border-white/5 hover:bg-white/10 hover:border-blue-500/30" 
+                  : "bg-white border-slate-100 shadow-sm hover:border-blue-500/30 hover:bg-blue-50/30"
+              )}
             >
-              <div style={styles.rowMain}>
-                <span style={styles.subscriberName}>{c.subscriberName}</span>
-                <span
-                  style={{
-                    ...styles.badge,
-                    background: c.mobileType === "RMN" ? "#10b981" : "#3b82f6",
-                  }}
-                >
-                  {c.mobileType}
-                </span>
+              <div className="flex-1 min-w-0 space-y-3">
+                <div className="flex items-center gap-3">
+                  <span className={cn(
+                    "text-sm font-bold truncate",
+                    isDark ? "text-slate-200" : "text-slate-900"
+                  )}>
+                    {c.subscriberName}
+                  </span>
+                  <span className={cn(
+                    "text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-widest",
+                    c.mobileType === "RMN" 
+                      ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/20" 
+                      : "bg-blue-500/10 text-blue-500 border border-blue-500/20"
+                  )}>
+                    {c.mobileType}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <Hash size={12} className="text-slate-600" />
+                    <span className="text-[11px] font-mono font-bold text-orange-500">{c.vcNumber}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold text-slate-600 uppercase">SMSID:</span>
+                    <span className="text-[11px] font-mono font-bold text-slate-400">{c.smsId}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2">
+                  <MapPin size={12} className="text-slate-600 shrink-0 mt-0.5" />
+                  <span className="text-[11px] text-slate-500 font-medium line-clamp-1">
+                    {c.address} — {c.city}, {c.state}
+                  </span>
+                </div>
               </div>
-              <div style={styles.rowSub}>
-                <span style={styles.vcLabel}>VC:</span>
-                <span style={styles.vcValue}>{c.vcNumber}</span>
-                <span style={styles.divider}>|</span>
-                <span style={styles.vcLabel}>SMSID:</span>
-                <span style={styles.vcValue}>{c.smsId}</span>
+              
+              <div className={cn(
+                "w-10 h-10 rounded-full flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 group-hover:translate-x-1",
+                isDark ? "bg-white/5" : "bg-slate-100"
+              )}>
+                <ChevronRight size={20} className="text-blue-500" />
               </div>
-              <div style={styles.rowAddr}>
-                {c.address} — {c.city}, {c.state}
-              </div>
-            </div>
+            </button>
           ))}
         </div>
 
-        <div style={styles.footer}>
-          <p style={styles.footerNote}>
-            ℹ️ Equivalent to{" "}
-            <code>usp_CUSTOMERSERVICE_SearchSubsDetailByMobnEmail</code> in
-            legacy system
+        {/* Footer */}
+        <div className={cn(
+          "px-6 py-4 border-t flex items-center gap-3",
+          isDark ? "bg-white/[0.01] border-white/5" : "bg-slate-50 border-slate-100"
+        )}>
+          <Info size={14} className="text-slate-600" />
+          <p className={cn(
+            "text-[10px] font-bold uppercase tracking-widest",
+            isDark ? "text-slate-600" : "text-slate-400"
+          )}>
+            Equivalent to usp_CUSTOMERSERVICE_SearchSubsDetailByMobnEmail in legacy
           </p>
         </div>
       </div>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  overlay: {
-    position: "fixed",
-    inset: 0,
-    background: "rgba(0,0,0,0.75)",
-    zIndex: 1000,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  modal: {
-    background: "#1e293b",
-    borderRadius: "12px",
-    width: "600px",
-    maxWidth: "90vw",
-    maxHeight: "80vh",
-    display: "flex",
-    flexDirection: "column",
-    boxShadow: "0 25px 60px rgba(0,0,0,0.5)",
-    border: "1px solid #334155",
-    overflow: "hidden",
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    padding: "20px 24px 16px",
-    borderBottom: "1px solid #334155",
-  },
-  title: {
-    margin: 0,
-    fontSize: "18px",
-    fontWeight: 700,
-    color: "#f1f5f9",
-  },
-  subtitle: {
-    margin: "4px 0 0",
-    fontSize: "13px",
-    color: "#94a3b8",
-  },
-  closeBtn: {
-    background: "none",
-    border: "none",
-    color: "#94a3b8",
-    cursor: "pointer",
-    fontSize: "18px",
-    padding: "4px 8px",
-    borderRadius: "4px",
-  },
-  list: {
-    overflowY: "auto",
-    flex: 1,
-    padding: "12px 16px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-  },
-  row: {
-    background: "#0f172a",
-    border: "1px solid #334155",
-    borderRadius: "8px",
-    padding: "14px 16px",
-    cursor: "pointer",
-    transition: "background 0.15s",
-    display: "flex",
-    flexDirection: "column",
-    gap: "4px",
-  },
-  rowMain: {
-    display: "flex",
-    alignItems: "center",
-    gap: "10px",
-  },
-  subscriberName: {
-    fontWeight: 600,
-    color: "#f1f5f9",
-    fontSize: "15px",
-  },
-  badge: {
-    padding: "2px 8px",
-    borderRadius: "4px",
-    fontSize: "11px",
-    fontWeight: 600,
-    color: "#fff",
-    letterSpacing: "0.5px",
-  },
-  rowSub: {
-    display: "flex",
-    gap: "6px",
-    fontSize: "12px",
-    color: "#64748b",
-    alignItems: "center",
-  },
-  vcLabel: {
-    color: "#475569",
-    fontWeight: 600,
-    fontSize: "11px",
-    textTransform: "uppercase",
-  },
-  vcValue: {
-    color: "#93c5fd",
-    fontFamily: "monospace",
-    fontSize: "12px",
-  },
-  divider: {
-    color: "#334155",
-    margin: "0 4px",
-  },
-  rowAddr: {
-    fontSize: "12px",
-    color: "#64748b",
-  },
-  footer: {
-    borderTop: "1px solid #1e293b",
-    padding: "12px 24px",
-    background: "#0f172a",
-  },
-  footerNote: {
-    margin: 0,
-    fontSize: "11px",
-    color: "#475569",
-  },
-};

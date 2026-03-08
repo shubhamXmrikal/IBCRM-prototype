@@ -1,142 +1,90 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FestiveOffer, FestiveEligibilityResult, CampaignStatus } from "../../../domain/package/CampaignTypes";
+import { 
+  Sparkles, 
+  Gift, 
+  Zap, 
+  ArrowUpCircle,
+  Coins,
+  ChevronRight,
+  Info
+} from "lucide-react";
+import { cn } from "../../../lib/utils";
 
-interface FestiveOffersTabProps {
-  smsId: string;
-  vcNumber: string;
-}
-
-export default function FestiveOffersTab({ smsId, vcNumber }: FestiveOffersTabProps) {
-  const [offers, setOffers] = useState<FestiveOffer[]>([]);
-  const [eligibility, setEligibility] = useState<FestiveEligibilityResult | null>(null);
-  const [campaigns, setCampaigns] = useState<CampaignStatus[]>([]);
+export default function FestiveOffersTab({ vcNumber }: { vcNumber: string }) {
+  const [offers, setOffers] = useState<any[]>([]);
+  const [cashback, setCashback] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchData();
-  }, [smsId, vcNumber]);
+    const fetchOffers = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/campaigns/festive?vcNumber=${vcNumber}`);
+        const data = await res.json();
+        setOffers(data.offers || []);
+        setCashback(data.cashback);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOffers();
+  }, [vcNumber]);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const [festRes, campRes] = await Promise.all([
-      fetch(`/api/campaigns/festive?smsId=${smsId}&vcNumber=${vcNumber}`),
-      fetch(`/api/campaigns/status?smsId=${smsId}`)
-    ]);
-
-    if (festRes.ok) {
-      const data = await festRes.json();
-      setOffers(data.offers);
-      setEligibility(data.eligibility);
-    }
-    if (campRes.ok) {
-      setCampaigns(await campRes.json());
-    }
-    setLoading(false);
-  };
-
-  if (loading) return <div style={{ padding: "20px", textAlign: "center" }}>Loading Campaign Hub...</div>;
+  if (loading) return <div className="p-8 text-center animate-pulse text-slate-600 font-bold uppercase text-[10px]">Checking Eligibility...</div>;
 
   return (
-    <div style={styles.container}>
-      {/* Active Campaigns Section */}
-      {campaigns.length > 0 && (
-        <div style={styles.section}>
-          <h4 style={{ margin: "0 0 12px 0", color: "#1e293b" }}>🎯 Live Campaigns</h4>
-          {campaigns.map(c => (
-            <div key={c.campaignId} style={styles.campaignCard}>
-              <div style={styles.campaignHeader}>
-                <div style={{ fontWeight: 700 }}>{c.name}</div>
-                <div style={styles.pointsBadge}>{c.bonusPoints} Bonus Pts</div>
-              </div>
-              <div style={styles.milestones}>
-                {c.milestonesReached.map((m, i) => (
-                  <span key={i} style={styles.milestoneTag}>✓ {m}</span>
-                ))}
-              </div>
-              <div style={{ fontSize: "11px", marginTop: "8px", color: "#64748b" }}>
-                Engagement Level: <strong>{c.engagementLevel}</strong>
-              </div>
+    <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Cashback Hero */}
+      {cashback?.isEligible && (
+        <div className="relative overflow-hidden p-4 rounded-2xl bg-gradient-to-br from-orange-600 to-amber-600 shadow-xl shadow-orange-900/20">
+          <div className="absolute -right-4 -top-4 opacity-20">
+             <Coins size={100} />
+          </div>
+          <div className="relative z-10 flex flex-col gap-1">
+             <div className="text-[10px] font-black uppercase tracking-[0.2em] text-orange-100">Festive Cashback Active</div>
+             <div className="text-2xl font-black text-white">₹{cashback.amount}.00 <span className="text-sm font-medium opacity-80 underline">Credit Available</span></div>
+             <p className="text-[10px] text-orange-100/80 mt-1 max-w-[200px]">Applicable on recharges above ₹500 before {new Date(cashback.expiryDate).toLocaleDateString()}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Campaigns & Upgrades */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 px-1">
+           <Gift size={14} className="text-orange-500" />
+           <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Available Promotions</span>
+        </div>
+
+        <div className="grid grid-cols-1 gap-2">
+          {offers.map((offer) => (
+            <div key={offer.id} className="group p-3 rounded-xl bg-white/[0.03] border border-white/5 hover:border-orange-500/20 transition-all flex items-center justify-between">
+               <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-white/5 border border-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                     {offer.type === 'UPGRADE' ? <ArrowUpCircle className="text-blue-400" /> : <Sparkles className="text-amber-400" />}
+                  </div>
+                  <div>
+                     <div className="text-[11px] font-bold text-slate-200">{offer.title}</div>
+                     <div className="text-[9px] text-slate-500 font-medium">{offer.description}</div>
+                  </div>
+               </div>
+               <button className="p-2 rounded-full bg-orange-600/10 text-orange-500 hover:bg-orange-600 hover:text-white transition-all">
+                  <ChevronRight size={14} />
+               </button>
             </div>
           ))}
-        </div>
-      )}
 
-      {/* Festive Eligibility & Cashback */}
-      {eligibility && eligibility.isEligible && (
-        <div style={styles.cashbackBox}>
-          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-            <span style={{ fontSize: "24px" }}>🧧</span>
-            <div>
-              <div style={{ fontWeight: 700 }}>Festive Cashback Eligible!</div>
-              <div style={{ fontSize: "12px" }}>
-                Get <strong>₹{eligibility.cashback?.amount}</strong> back on your next renewal.
-              </div>
+          {offers.length === 0 && (
+            <div className="p-8 text-center bg-white/[0.01] border border-dashed border-white/5 rounded-2xl">
+               <Info size={24} className="mx-auto mb-2 text-slate-700" />
+               <p className="text-[10px] font-bold text-slate-600 uppercase">No active campaigns for this zone</p>
             </div>
-          </div>
-          <div style={{ fontSize: "11px", opacity: 0.8 }}>
-            Valid: {new Date(eligibility.cashback!.validFrom).toLocaleDateString()} - {new Date(eligibility.cashback!.validTo).toLocaleDateString()}
-          </div>
-        </div>
-      )}
-
-      {/* Available Festive Offers */}
-      <div style={styles.section}>
-        <h4 style={{ margin: "0 0 12px 0", color: "#1e293b" }}>🎁 Festive Special Upgrades</h4>
-        <div style={styles.offerGrid}>
-          {offers.length === 0 ? (
-            <div style={styles.empty}>No festive offers currently available for your STB type.</div>
-          ) : (
-            offers.map(o => (
-              <div key={o.id} style={styles.offerCard}>
-                <div style={styles.typeBadge}>{o.type}</div>
-                <div style={styles.offerName}>{o.name}</div>
-                <div style={styles.packageName}>{o.packageName}</div>
-                <div style={styles.offerValue}>Save ₹{o.offerAmount}</div>
-                <button 
-                  style={styles.applyBtn}
-                  onClick={() => alert(`Applying Festive Offer: ${o.name}`)}
-                >
-                  Apply Offer
-                </button>
-              </div>
-            ))
           )}
         </div>
       </div>
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: { padding: "16px", display: "flex", flexDirection: "column", gap: "24px" },
-  section: { flex: 1 },
-  campaignCard: { padding: "16px", background: "#f0f9ff", border: "1px solid #bae6fd", borderRadius: "12px" },
-  campaignHeader: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" },
-  pointsBadge: { background: "#0ea5e9", color: "white", padding: "2px 8px", borderRadius: "4px", fontSize: "11px", fontWeight: 700 },
-  milestones: { display: "flex", flexWrap: "wrap", gap: "8px" },
-  milestoneTag: { fontSize: "11px", color: "#0369a1", background: "white", padding: "2px 6px", borderRadius: "4px", border: "1px solid #7dd3fc" },
-  cashbackBox: {
-    padding: "16px 20px", background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)",
-    color: "white", borderRadius: "12px", display: "flex", justifyContent: "space-between", alignItems: "center",
-    boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
-  },
-  offerGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: "16px" },
-  offerCard: {
-    padding: "16px", background: "white", borderRadius: "8px", border: "1px solid #e2e8f0",
-    display: "flex", flexDirection: "column", position: "relative"
-  },
-  typeBadge: {
-    position: "absolute", top: "8px", right: "8px", fontSize: "9px", fontWeight: 700,
-    padding: "2px 6px", background: "#fef3c7", color: "#92400e", borderRadius: "4px", textTransform: "uppercase"
-  },
-  offerName: { fontWeight: 700, fontSize: "14px", marginBottom: "4px" },
-  packageName: { fontSize: "12px", color: "#64748b", marginBottom: "12px" },
-  offerValue: { color: "#16a34a", fontWeight: 800, fontSize: "16px", marginBottom: "12px" },
-  applyBtn: {
-    padding: "8px", background: "var(--brand-primary)", color: "white",
-    border: "none", borderRadius: "6px", fontWeight: 600, cursor: "pointer", fontSize: "12px"
-  },
-  empty: { textAlign: "center", padding: "20px", color: "#64748b", border: "1px dashed #cbd5e1", borderRadius: "8px" }
-};
