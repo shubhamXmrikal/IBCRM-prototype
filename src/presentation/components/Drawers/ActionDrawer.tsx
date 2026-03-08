@@ -86,7 +86,7 @@ export default function ActionDrawer() {
       case 'SERVICE':
         return <div className="p-4"><ServiceHierarchyCard vcNumber={activeCustomer.vcNumber} /></div>;
       case 'HARDWARE':
-        return <HardwareManagementTab vcNumber={activeCustomer.vcNumber} />;
+        return <HardwareManagementTab vcNumber={activeCustomer.vcNumber} mobileNo={activeCustomer.contact.mobile1} />;
       case 'DNC':
         return <DNCManagementPanel />;
       case 'COMPLAINTS':
