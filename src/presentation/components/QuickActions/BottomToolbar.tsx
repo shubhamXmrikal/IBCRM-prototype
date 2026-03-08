@@ -84,7 +84,7 @@ function DropdownButton({ label, icon: Icon, items }: DropdownButtonProps) {
 
 export default function BottomToolbar() {
   const [isTempDeactivationOpen, setIsTempDeactivationOpen] = useState(false);
-  const { activeCustomer } = useAgentStore();
+  const { activeCustomer, setActiveActionDrawer } = useAgentStore();
 
   const mockSubscriber = {
     vcNo: activeCustomer?.vcNumber || "123456789012",
@@ -96,9 +96,21 @@ export default function BottomToolbar() {
     <div className="flex items-center gap-2 p-1.5 glass border border-white/10 rounded-2xl shadow-2xl shadow-black/50 pointer-events-auto">
       {/* Quick Action Group */}
       <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/5 mr-2">
-        <QuickButton icon={Tag} label="Tagging" />
-        <QuickButton icon={FileText} label="SOA" />
-        <QuickButton icon={MessageSquare} label="SMS" />
+        <QuickButton 
+          icon={Tag} 
+          label="Tagging" 
+          onClick={() => setActiveActionDrawer('COMPLAINTS')}
+        />
+        <QuickButton 
+          icon={FileText} 
+          label="SOA" 
+          onClick={() => setActiveActionDrawer('SOA')}
+        />
+        <QuickButton 
+          icon={MessageSquare} 
+          label="SMS" 
+          onClick={() => setActiveActionDrawer('COMMUNICATIONS')}
+        />
       </div>
 
       {/* Categorized Dropdowns */}
@@ -108,7 +120,7 @@ export default function BottomToolbar() {
           icon={Search}
           items={[
             { label: "Pincode Master" },
-            { label: "Service Hierarchy" },
+            { label: "Service Hierarchy", onClick: () => setActiveActionDrawer('SERVICE') },
             { label: "Parent-Child Map" },
             { label: "Audit Email Log" },
           ]}
@@ -122,7 +134,7 @@ export default function BottomToolbar() {
             { label: "Advance Add-on" },
             { label: "HD Sampler Pack" },
             { label: "Sports Bundles" },
-            { label: "Channel Rollback" },
+            { label: "Channel Rollback", onClick: () => setActiveActionDrawer('PACKAGE_TOOL') },
           ]}
         />
 
@@ -130,8 +142,8 @@ export default function BottomToolbar() {
           label="System"
           icon={Settings2}
           items={[
-            { label: "DNC Management" },
-            { label: "STB/VC Pairing" },
+            { label: "DNC Management", onClick: () => setActiveActionDrawer('DNC') },
+            { label: "STB/VC Pairing", onClick: () => setActiveActionDrawer('HARDWARE') },
             { label: "DVR Authorization" },
             { label: "Manager Escalation" },
             { label: "Temp Deactivation", onClick: () => setIsTempDeactivationOpen(true) },
@@ -144,7 +156,7 @@ export default function BottomToolbar() {
           items={[
             { label: "LCO Alignment" },
             { label: "OYC Conversion" },
-            { label: "Dish VIP Enrollment" },
+            { label: "Dish VIP Enrollment", onClick: () => setActiveActionDrawer('VIP') },
             { label: "Price Protection" },
             { label: "Loyalty Cashback" },
           ]}
@@ -160,9 +172,12 @@ export default function BottomToolbar() {
   );
 }
 
-function QuickButton({ icon: Icon, label }: { icon: any, label: string }) {
+function QuickButton({ icon: Icon, label, onClick }: { icon: any, label: string, onClick?: () => void }) {
   return (
-    <button className="h-7 px-3 flex items-center gap-2 rounded-lg text-xxs font-black uppercase tracking-tighter text-slate-500 hover:bg-white/5 hover:text-slate-200 transition-all">
+    <button 
+      onClick={onClick}
+      className="h-7 px-3 flex items-center gap-2 rounded-lg text-xxs font-black uppercase tracking-tighter text-slate-500 hover:bg-white/5 hover:text-slate-200 transition-all"
+    >
       <Icon size={12} />
       {label}
     </button>

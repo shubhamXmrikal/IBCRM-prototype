@@ -11,7 +11,13 @@ import {
   Receipt, 
   AlertCircle, 
   Wrench,
-  ShieldCheck
+  ShieldCheck,
+  Smartphone,
+  MessageSquare,
+  Trophy,
+  Network,
+  Disc,
+  ShieldOff
 } from "lucide-react";
 import DishtvBrain from "../AI/DishtvBrain";
 import PackageToolBox from "../PackageTool/PackageToolBox";
@@ -19,6 +25,12 @@ import BillingAndSOATab from "../FinancialSummary/BillingAndSOATab";
 import ComplaintHistoryTab from "../CallHandling/ComplaintHistoryTab";
 import IntelligentComplaintLogger from "../CallHandling/IntelligentComplaintLogger";
 import KycVerification from "../VerificationModal/KycVerification";
+import WatchoDashboardTab from "../Watcho/WatchoDashboardTab";
+import CommunicationHistoryTab from "../CallHandling/CommunicationHistoryTab";
+import LoyaltyOverviewCard from "../FinancialSummary/LoyaltyOverviewCard";
+import ServiceHierarchyCard from "../HardwareDetails/ServiceHierarchyCard";
+import HardwareManagementTab from "../HardwareDetails/HardwareManagementTab";
+import DNCManagementPanel from "../SubscriberProfile/DNCManagementPanel";
 
 export default function ActionDrawer() {
   const { 
@@ -51,7 +63,7 @@ export default function ActionDrawer() {
     );
 
     // Security Interlock: Force KYC for sensitive tools if not verified
-    const sensitiveTools = ['PACKAGE_TOOL', 'CONTACT_UPDATE'];
+    const sensitiveTools = ['PACKAGE_TOOL', 'CONTACT_UPDATE', 'WATCHO', 'COMMUNICATIONS', 'VIP', 'SERVICE', 'HARDWARE', 'DNC'];
     if (sensitiveTools.includes(activeActionDrawer!) && !isCallerVerified) {
       return <KycVerification onSuccess={() => {}} />;
     }
@@ -65,6 +77,18 @@ export default function ActionDrawer() {
         return <PackageToolBox vcNumber={activeCustomer.vcNumber} smsId={activeCustomer.smsId} />;
       case 'SOA':
         return <BillingAndSOATab vcNumber={activeCustomer.vcNumber} smsId={activeCustomer.smsId} />;
+      case 'WATCHO':
+        return <WatchoDashboardTab vcNumber={activeCustomer.vcNumber} />;
+      case 'COMMUNICATIONS':
+        return <CommunicationHistoryTab vcNumber={activeCustomer.vcNumber} />;
+      case 'VIP':
+        return <div className="p-4"><LoyaltyOverviewCard vcNumber={activeCustomer.vcNumber} /></div>;
+      case 'SERVICE':
+        return <div className="p-4"><ServiceHierarchyCard vcNumber={activeCustomer.vcNumber} /></div>;
+      case 'HARDWARE':
+        return <HardwareManagementTab vcNumber={activeCustomer.vcNumber} />;
+      case 'DNC':
+        return <DNCManagementPanel />;
       case 'COMPLAINTS':
         return complaintView === 'HISTORY' 
           ? <ComplaintHistoryTab vcNumber={activeCustomer.vcNumber} onLogNew={() => setComplaintView('LOG')} />
@@ -76,7 +100,7 @@ export default function ActionDrawer() {
 
   const getTitle = () => {
     // Interlock Title override
-    const sensitiveTools = ['PACKAGE_TOOL', 'CONTACT_UPDATE'];
+    const sensitiveTools = ['PACKAGE_TOOL', 'CONTACT_UPDATE', 'WATCHO', 'COMMUNICATIONS', 'VIP', 'SERVICE', 'HARDWARE', 'DNC'];
     if (sensitiveTools.includes(activeActionDrawer!) && !isCallerVerified) {
       return 'Identity Verification';
     }
@@ -84,6 +108,12 @@ export default function ActionDrawer() {
     switch (activeActionDrawer) {
       case 'PACKAGE_TOOL': return 'Package Management';
       case 'SOA': return 'Statement of Account';
+      case 'WATCHO': return 'Watcho Management';
+      case 'COMMUNICATIONS': return 'Communication Logs';
+      case 'VIP': return 'VIP & Loyalty';
+      case 'SERVICE': return 'Service Hierarchy';
+      case 'HARDWARE': return 'Hardware Management';
+      case 'DNC': return 'DNC Management';
       case 'COMPLAINTS': return complaintView === 'HISTORY' ? 'Complaint History' : 'Log New Ticket';
       case 'TROUBLESHOOTING': return 'Technical Troubleshooting';
       case 'KYC': return 'Identity Verification';
@@ -93,7 +123,7 @@ export default function ActionDrawer() {
 
   const getIcon = () => {
     // Interlock Icon override
-    const sensitiveTools = ['PACKAGE_TOOL', 'CONTACT_UPDATE'];
+    const sensitiveTools = ['PACKAGE_TOOL', 'CONTACT_UPDATE', 'WATCHO', 'COMMUNICATIONS', 'VIP', 'SERVICE', 'HARDWARE', 'DNC'];
     if (sensitiveTools.includes(activeActionDrawer!) && !isCallerVerified) {
       return <ShieldCheck size={16} />;
     }
@@ -101,6 +131,12 @@ export default function ActionDrawer() {
     switch (activeActionDrawer) {
       case 'PACKAGE_TOOL': return <Package size={16} />;
       case 'SOA': return <Receipt size={16} />;
+      case 'WATCHO': return <Smartphone size={16} />;
+      case 'COMMUNICATIONS': return <MessageSquare size={16} />;
+      case 'VIP': return <Trophy size={16} />;
+      case 'SERVICE': return <Network size={16} />;
+      case 'HARDWARE': return <Disc size={16} />;
+      case 'DNC': return <ShieldOff size={16} />;
       case 'COMPLAINTS': return <AlertCircle size={16} />;
       case 'TROUBLESHOOTING': return <Wrench size={16} />;
       case 'KYC': return <ShieldCheck size={16} />;
@@ -126,7 +162,7 @@ export default function ActionDrawer() {
           <div className="flex items-center gap-2">
             <div className="text-orange-500">{getIcon()}</div>
             <div>
-              <h2 className="text-xs font-black uppercase tracking-tighter text-slate-200">{getTitle()}</h2>
+              <h2 className={cn("text-xs font-black uppercase tracking-tighter", theme === 'dark' ? "text-slate-200" : "text-slate-800")}>{getTitle()}</h2>
               <p className="text-[10px] text-slate-500 font-bold">VC: {activeCustomer?.vcNumber}</p>
             </div>
           </div>

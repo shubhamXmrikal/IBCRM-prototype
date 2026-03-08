@@ -19,7 +19,7 @@ interface AgentState {
   theme: 'dark' | 'light';
   isRightPanelOpen: boolean;
   isDrawerExpanded: boolean;
-  activeActionDrawer: 'AI' | 'PACKAGE_TOOL' | 'SOA' | 'COMPLAINTS' | 'TROUBLESHOOTING' | 'CONTACT_UPDATE' | 'KYC' | null;
+  activeActionDrawer: 'AI' | 'PACKAGE_TOOL' | 'SOA' | 'COMPLAINTS' | 'TROUBLESHOOTING' | 'CONTACT_UPDATE' | 'KYC' | 'WATCHO' | 'COMMUNICATIONS' | 'VIP' | 'SERVICE' | 'HARDWARE' | 'DNC' | null;
   isCommandPaletteOpen: boolean;
   activeSidebarTab: string;
   sentiment: 'CALM' | 'NEUTRAL' | 'FRUSTRATED' | 'ANGRY';
