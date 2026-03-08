@@ -68,7 +68,7 @@ export default function Header({
                 <option
                   key={opt.value}
                   value={opt.value}
-                  className={theme === 'dark' ? "bg-[#0B0F1A]" : "bg-white"}
+                  className={theme === "dark" ? "bg-[#0B0F1A]" : "bg-white"}
                 >
                   {opt.label}
                 </option>
